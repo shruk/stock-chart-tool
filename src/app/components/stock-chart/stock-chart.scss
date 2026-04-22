@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.chart-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  width: 100%;
+  height: 500px;
+  position: relative;
+}
+
+.sub-chart-container {
+  width: 100%;
+  height: 140px;
+  position: relative;
+  border-top: 1px solid #1e293b;
+}

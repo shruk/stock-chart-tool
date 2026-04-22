@@ -1,0 +1,35 @@
+<button class="gear-btn" (click)="openPanel()" title="Settings">&#9881;</button>
+
+@if (open()) {
+  <div class="overlay" (click)="close()"></div>
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Settings</h2>
+      <button class="close-btn" (click)="close()">&#x2715;</button>
+    </div>
+
+    <div class="panel-body">
+      <label class="field-label">Polygon.io API Key</label>
+      <div class="key-row">
+        <input
+          [type]="showKey() ? 'text' : 'password'"
+          [value]="apiKeyDraft()"
+          (input)="apiKeyDraft.set($any($event.target).value)"
+          placeholder="Enter your API key"
+          class="key-input"
+        />
+        <button class="toggle-btn" (click)="showKey.set(!showKey())">
+          {{ showKey() ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+      <p class="hint">Get a free key at <strong>polygon.io</strong></p>
+
+      <div class="actions">
+        <button class="btn-save" (click)="save()" [disabled]="!apiKeyDraft()">Save</button>
+        @if (saved()) {
+          <span class="saved-msg">&#10003; Saved</span>
+        }
+      </div>
+    </div>
+  </div>
+}

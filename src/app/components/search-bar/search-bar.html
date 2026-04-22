@@ -1,0 +1,24 @@
+<div class="search-bar">
+  <input
+    type="text"
+    [value]="symbol()"
+    (input)="symbol.set($any($event.target).value.toUpperCase())"
+    (keydown.enter)="onSymbolEnter()"
+    placeholder="Symbol — press Enter"
+    class="input symbol-input"
+  />
+
+  <div class="timeframe-group">
+    @for (tf of timeframes; track tf) {
+      <button
+        class="btn-tf"
+        [class.active]="timeframe() === tf"
+        (click)="selectTimeframe(tf)"
+      >{{ tf }}</button>
+    }
+  </div>
+
+  @if (!hasApiKey) {
+    <span class="no-key-hint">Set your API key in Settings &#9881;</span>
+  }
+</div>
