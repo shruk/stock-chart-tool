@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Bar } from './polygon';
+import { AnalystData } from './finnhub';
 
 @Injectable({ providedIn: 'root' })
 export class MockDataService {
@@ -28,25 +29,49 @@ export class MockDataService {
     return bars;
   }
 
+  generateAnalyst(currentPrice: number): AnalystData {
+    const r = () => Math.floor(Math.random() * 15);
+    const strongBuy = r() + 5;
+    const buy = r() + 3;
+    const hold = r();
+    const sell = Math.floor(Math.random() * 5);
+    const strongSell = Math.floor(Math.random() * 3);
+
+    const targetMean = +(currentPrice * (1 + (Math.random() * 0.3 - 0.05))).toFixed(2);
+    const targetLow  = +(targetMean * (1 - Math.random() * 0.15)).toFixed(2);
+    const targetHigh = +(targetMean * (1 + Math.random() * 0.2)).toFixed(2);
+    const targetMedian = +((targetMean + targetLow) / 2).toFixed(2);
+
+    const week52High = +(currentPrice * (1 + Math.random() * 0.35)).toFixed(2);
+    const week52Low  = +(currentPrice * (1 - Math.random() * 0.35)).toFixed(2);
+
+    const peRatio = +(15 + Math.random() * 25).toFixed(1);
+    const marketCap = +(currentPrice * (500 + Math.random() * 5000)).toFixed(0);
+    const beta = +(0.7 + Math.random() * 1.3).toFixed(2);
+    const dividendYield = Math.random() > 0.4 ? +(Math.random() * 3).toFixed(2) : 0;
+    const eps = +(currentPrice / peRatio).toFixed(2);
+    const revenueGrowthYoy = +((Math.random() * 30) - 5).toFixed(1);
+    const roeTTM = +(10 + Math.random() * 40).toFixed(1);
+    const currentRatio = +(0.8 + Math.random() * 2).toFixed(2);
+
+    return {
+      recommendation: { strongBuy, buy, hold, sell, strongSell, period: new Date().toISOString().slice(0, 7) + '-01' },
+      priceTarget: { targetHigh, targetLow, targetMean, targetMedian, lastUpdated: new Date().toISOString().slice(0, 10) },
+      metrics: { week52High, week52Low, week52HighDate: '', week52LowDate: '', peRatio, marketCap, beta, dividendYield, eps, revenueGrowthYoy, roeTTM, currentRatio },
+      profile: null,
+    };
+  }
+
   private barCount(timeframe: string): number {
     const map: Record<string, number> = {
-      '1D': 78,   // ~6.5 hours of hourly bars
-      '1W': 130,
-      '1M': 22,
-      '3M': 66,
-      '6M': 130,
-      '1Y': 252,
-      '2Y': 104,  // weekly
-      '5Y': 260,
-      '10Y': 520,
+      '1D': 78, '1W': 130, '1M': 22, '3M': 66,
+      '6M': 130, '1Y': 252, '2Y': 104, '5Y': 260, '10Y': 520,
     };
     return map[timeframe] ?? 90;
   }
 
   private intervalSeconds(timeframe: string): number {
-    const hour = 3600;
-    const day = 86400;
-    const week = day * 7;
+    const hour = 3600, day = 86400, week = day * 7;
     const map: Record<string, number> = {
       '1D': hour, '1W': hour,
       '1M': day, '3M': day, '6M': day, '1Y': day,

@@ -15,17 +15,41 @@
           [type]="showKey() ? 'text' : 'password'"
           [value]="apiKeyDraft()"
           (input)="apiKeyDraft.set($any($event.target).value)"
-          placeholder="Enter your API key"
+          placeholder="Enter your Polygon key"
           class="key-input"
         />
-        <button class="toggle-btn" (click)="showKey.set(!showKey())">
-          {{ showKey() ? 'Hide' : 'Show' }}
-        </button>
+        <button class="toggle-btn" (click)="showKey.set(!showKey())">{{ showKey() ? 'Hide' : 'Show' }}</button>
       </div>
       <p class="hint">Get a free key at <strong>polygon.io</strong></p>
 
+      <label class="field-label" style="margin-top:16px">Finnhub API Key</label>
+      <div class="key-row">
+        <input
+          [type]="showFinnhubKey() ? 'text' : 'password'"
+          [value]="finnhubKeyDraft()"
+          (input)="finnhubKeyDraft.set($any($event.target).value)"
+          placeholder="Enter your Finnhub key"
+          class="key-input"
+        />
+        <button class="toggle-btn" (click)="showFinnhubKey.set(!showFinnhubKey())">{{ showFinnhubKey() ? 'Hide' : 'Show' }}</button>
+      </div>
+      <p class="hint">Get a free key at <strong>finnhub.io</strong> — analyst ratings &amp; metrics</p>
+
+      <label class="field-label" style="margin-top:16px">Financial Modeling Prep API Key</label>
+      <div class="key-row">
+        <input
+          [type]="showFmpKey() ? 'text' : 'password'"
+          [value]="fmpKeyDraft()"
+          (input)="fmpKeyDraft.set($any($event.target).value)"
+          placeholder="Enter your FMP key"
+          class="key-input"
+        />
+        <button class="toggle-btn" (click)="showFmpKey.set(!showFmpKey())">{{ showFmpKey() ? 'Hide' : 'Show' }}</button>
+      </div>
+      <p class="hint">Get a free key at <strong>financialmodelingprep.com</strong> — analyst price targets</p>
+
       <div class="actions">
-        <button class="btn-save" (click)="save()" [disabled]="!apiKeyDraft()">Save</button>
+        <button class="btn-save" (click)="save()">Save</button>
         @if (saved()) {
           <span class="saved-msg">&#10003; Saved</span>
         }

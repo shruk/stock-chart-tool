@@ -1,0 +1,167 @@
+<div class="analyst-panel">
+
+  @if (loading()) {
+    <div class="loading">Loading analyst data...</div>
+  } @else if (!data()) {
+    <div class="no-data">Enter a Finnhub API key in ⚙ Settings to see analyst data.</div>
+  } @else {
+
+    <!-- Company Profile -->
+    @if (profile()) {
+      <div class="profile-section">
+        @if (profile()!.logo) {
+          <img class="logo" [src]="profile()!.logo" [alt]="profile()!.name" />
+        }
+        <div class="profile-info">
+          <div class="company-name">{{ profile()!.name }}</div>
+          <div class="profile-meta">
+            <span>{{ profile()!.exchange }}</span>
+            @if (profile()!.industry) { <span>· {{ profile()!.industry }}</span> }
+            @if (profile()!.country) { <span>· {{ profile()!.country }}</span> }
+            @if (profile()!.ipo) { <span>· IPO {{ profile()!.ipo }}</span> }
+          </div>
+        </div>
+      </div>
+    }
+
+    <div class="sections-row">
+
+      <!-- Analyst Ratings donut -->
+      @if (rec()) {
+        <div class="section">
+          <div class="section-title">
+            Analyst Ratings
+            @if (consensusLabel()) {
+              <span class="consensus-badge" [class]="consensusLabel()!.cls">{{ consensusLabel()!.text }}</span>
+            }
+          </div>
+          <div class="donut-wrap">
+            <svg viewBox="0 0 96 96" width="96" height="96">
+              <circle cx="48" cy="48" r="36" fill="none" stroke="#0f172a" stroke-width="12"/>
+              <g transform="rotate(-90 48 48)">
+                @for (seg of donutSegments(); track $index) {
+                  <circle cx="48" cy="48" r="36" fill="none"
+                    [attr.stroke]="seg.color" stroke-width="12" stroke-linecap="butt"
+                    [attr.stroke-dasharray]="seg.dasharray"
+                    [attr.stroke-dashoffset]="seg.dashoffset"/>
+                }
+              </g>
+              @if (consensusLabel()) {
+                <text x="48" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#f1f5f9">{{ consensusLabel()!.text }}</text>
+              }
+              <text x="48" y="57" text-anchor="middle" font-size="8" fill="#64748b">{{ totalRatings() }} analysts</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><span class="leg-dot" style="background:#4ade80"></span><span>Strong Buy <strong>{{ rec()!.strongBuy }}</strong></span></div>
+              <div class="legend-item"><span class="leg-dot" style="background:#22c55e"></span><span>Buy <strong>{{ rec()!.buy }}</strong></span></div>
+              <div class="legend-item"><span class="leg-dot" style="background:#eab308"></span><span>Hold <strong>{{ rec()!.hold }}</strong></span></div>
+              <div class="legend-item"><span class="leg-dot" style="background:#f87171"></span><span>Sell <strong>{{ rec()!.sell }}</strong></span></div>
+              <div class="legend-item"><span class="leg-dot" style="background:#ef4444"></span><span>Strong Sell <strong>{{ rec()!.strongSell }}</strong></span></div>
+            </div>
+          </div>
+          <div class="period">Period: {{ rec()!.period }}</div>
+        </div>
+      }
+
+      <!-- 52W Range bar -->
+      @if (metrics()?.week52High) {
+        <div class="section">
+          <div class="section-title">52-Week Range</div>
+          <div class="range-header">
+            @if (currentPrice()) {
+              <span class="range-current">${{ currentPrice() | number:'1.2-2' }}</span>
+            }
+          </div>
+          <div class="range-bar-wrap">
+            <span class="range-edge">${{ metrics()!.week52Low | number:'1.0-0' }}</span>
+            <div class="range-track">
+              @if (week52Position() !== null) {
+                <div class="range-fill" [style.width.%]="week52Position()!"></div>
+                <div class="price-marker" [style.left.%]="week52Position()!">
+                  <div class="marker-dot"></div>
+                </div>
+              }
+            </div>
+            <span class="range-edge">${{ metrics()!.week52High | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- Analyst Price Target bar -->
+      @if (target()?.targetMean) {
+        <div class="section">
+          <div class="section-title">Analyst Price Target</div>
+          <div class="range-header">
+            @if (currentPrice()) {
+              <span class="range-current">${{ currentPrice() | number:'1.2-2' }}</span>
+            }
+          </div>
+          <div class="range-bar-wrap">
+            <span class="range-edge">${{ target()!.targetLow | number:'1.0-0' }}</span>
+            <div class="range-track">
+              @if (targetPricePosition() !== null) {
+                <div class="range-fill target-fill" [style.width.%]="targetPricePosition()!"></div>
+                <div class="price-marker" [style.left.%]="targetPricePosition()!">
+                  <div class="marker-dot"></div>
+                </div>
+              }
+              @if (targetMeanPosition() !== null) {
+                <div class="mean-marker" [style.left.%]="targetMeanPosition()!"></div>
+              }
+            </div>
+            <span class="range-edge">${{ target()!.targetHigh | number:'1.0-0' }}</span>
+          </div>
+          <div class="range-legend">
+            <span class="legend-mean">&#9646; Mean ${{ target()!.targetMean | number:'1.2-2' }}</span>
+            <span class="legend-median">Median ${{ target()!.targetMedian | number:'1.2-2' }}</span>
+          </div>
+          <div class="period">Updated: {{ target()!.lastUpdated }}</div>
+        </div>
+      }
+
+      <!-- Key Metrics -->
+      @if (metrics()) {
+        <div class="section">
+          <div class="section-title">Key Metrics</div>
+          <div class="metrics-grid">
+            <div class="metric">
+              <span class="m-label">Market Cap</span>
+              <span class="m-val">{{ formatMarketCap(metrics()!.marketCap) }}</span>
+            </div>
+            <div class="metric">
+              <span class="m-label">P/E (TTM)</span>
+              <span class="m-val">{{ metrics()!.peRatio ? (metrics()!.peRatio | number:'1.1-1') : '—' }}</span>
+            </div>
+            <div class="metric">
+              <span class="m-label">EPS (TTM)</span>
+              <span class="m-val">{{ metrics()!.eps ? '$' + (metrics()!.eps | number:'1.2-2') : '—' }}</span>
+            </div>
+            <div class="metric">
+              <span class="m-label">Beta</span>
+              <span class="m-val">{{ metrics()!.beta ? (metrics()!.beta | number:'1.2-2') : '—' }}</span>
+            </div>
+            <div class="metric">
+              <span class="m-label">Div Yield</span>
+              <span class="m-val">{{ metrics()!.dividendYield ? (metrics()!.dividendYield | number:'1.2-2') + '%' : '—' }}</span>
+            </div>
+            <div class="metric">
+              <span class="m-label">ROE (TTM)</span>
+              <span class="m-val">{{ metrics()!.roeTTM ? (metrics()!.roeTTM | number:'1.1-1') + '%' : '—' }}</span>
+            </div>
+            <div class="metric">
+              <span class="m-label">Rev Growth YoY</span>
+              <span class="m-val" [class.up]="(metrics()!.revenueGrowthYoy ?? 0) >= 0" [class.down]="(metrics()!.revenueGrowthYoy ?? 0) < 0">
+                {{ metrics()!.revenueGrowthYoy != null ? (metrics()!.revenueGrowthYoy | number:'1.1-1') + '%' : '—' }}
+              </span>
+            </div>
+            <div class="metric">
+              <span class="m-label">Current Ratio</span>
+              <span class="m-val">{{ metrics()!.currentRatio ? (metrics()!.currentRatio | number:'1.2-2') : '—' }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+</div>

@@ -1,0 +1,197 @@
+<div class="app">
+  <header class="header">
+    <h1 class="title">Stock Dashboard</h1>
+    <div class="header-actions">
+      <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
+        {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
+      </button>
+      @if (!testMode()) {
+        <button class="refresh-btn" (click)="loadAll(false)">&#8635; Refresh</button>
+      }
+      <app-settings-panel />
+    </div>
+  </header>
+
+  @if (testMode()) {
+    <div class="test-banner">Test Mode — displaying generated fake data. No API key required.</div>
+  }
+  <div class="grid">
+    @for (stock of stocks(); track stock.symbol) {
+      <div class="card" (click)="openStock(stock.symbol)">
+
+        <!-- Top: symbol / name / price -->
+        <div class="card-top">
+          <div class="card-top-left">
+            <div class="symbol">{{ stock.symbol }}</div>
+            <div class="name">{{ stock.name }}</div>
+            @if (stock.analyst?.priceTarget?.targetMean) {
+              <div class="target-price">
+                <span class="target-label">Analyst Target</span>
+                <span class="target-mean">${{ stock.analyst!.priceTarget!.targetMean | number:'1.2-2' }}</span>
+                <span class="target-range">${{ stock.analyst!.priceTarget!.targetLow | number:'1.0-0' }} – ${{ stock.analyst!.priceTarget!.targetHigh | number:'1.0-0' }}</span>
+              </div>
+            }
+          </div>
+          @if (stock.loading) {
+            <div class="price-loading"></div>
+          } @else if (stock.price !== null) {
+            <div class="price-block" [class.up]="(stock.change ?? 0) >= 0" [class.down]="(stock.change ?? 0) < 0">
+              <div class="price">${{ stock.price | number:'1.2-2' }}</div>
+              <div class="change">
+                {{ (stock.change ?? 0) >= 0 ? '+' : '' }}{{ stock.change | number:'1.2-2' }}
+                &nbsp;({{ (stock.changePct ?? 0) >= 0 ? '+' : '' }}{{ stock.changePct | number:'1.2-2' }}%)
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Sparkline -->
+        <div class="sparkline-wrap">
+          @if (stock.loading) {
+            <div class="loading-bar"></div>
+          } @else if (stock.error) {
+            <div class="card-error">{{ stock.error }}</div>
+          } @else if (stock.sparkline.length > 1) {
+            <app-sparkline [data]="stock.sparkline" />
+          }
+        </div>
+
+        <!-- Analyst rating section -->
+        @if (stock.analystLoading) {
+          <div class="analyst-skeleton">
+            <div class="skel-circle"></div>
+          </div>
+        } @else if (stock.analyst?.recommendation) {
+          <div class="rating-section">
+            <div class="donut-wrap">
+              <svg viewBox="0 0 96 96" width="96" height="96">
+                <!-- Track -->
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#1e293b" stroke-width="12"/>
+                <!-- Segments -->
+                <g transform="rotate(-90 48 48)">
+                  @for (seg of donutSegments(stock) ?? []; track $index) {
+                    <circle cx="48" cy="48" r="36"
+                      fill="none"
+                      [attr.stroke]="seg.color"
+                      stroke-width="12"
+                      stroke-linecap="butt"
+                      [attr.stroke-dasharray]="seg.dasharray"
+                      [attr.stroke-dashoffset]="seg.dashoffset"
+                    />
+                  }
+                </g>
+                <!-- Center label -->
+                @if (consensus(stock); as c) {
+                  <text x="48" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#f1f5f9">{{ c.text }}</text>
+                }
+                <text x="48" y="57" text-anchor="middle" font-size="8" fill="#64748b">{{ totalRatings(stock) }} analysts</text>
+              </svg>
+
+              <div class="donut-legend">
+                <div class="legend-item"><span class="leg-dot" style="background:#4ade80"></span><span>Strong Buy <strong>{{ stock.analyst!.recommendation!.strongBuy }}</strong></span></div>
+                <div class="legend-item"><span class="leg-dot" style="background:#22c55e"></span><span>Buy <strong>{{ stock.analyst!.recommendation!.buy }}</strong></span></div>
+                <div class="legend-item"><span class="leg-dot" style="background:#eab308"></span><span>Hold <strong>{{ stock.analyst!.recommendation!.hold }}</strong></span></div>
+                <div class="legend-item"><span class="leg-dot" style="background:#f87171"></span><span>Sell <strong>{{ stock.analyst!.recommendation!.sell }}</strong></span></div>
+                <div class="legend-item"><span class="leg-dot" style="background:#ef4444"></span><span>Strong Sell <strong>{{ stock.analyst!.recommendation!.strongSell }}</strong></span></div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Key metrics -->
+        @if (stock.analyst?.metrics || stock.analyst?.priceTarget) {
+
+          <!-- 52W range bar -->
+          @if (stock.analyst?.metrics?.week52High) {
+            <div class="range-section">
+              <div class="range-header">
+                <span class="range-label-title">52-Week Range</span>
+                @if (stock.price !== null) {
+                  <span class="range-current">${{ stock.price | number:'1.2-2' }}</span>
+                }
+              </div>
+              <div class="range-bar-wrap">
+                <span class="range-edge">${{ stock.analyst!.metrics!.week52Low | number:'1.0-0' }}</span>
+                <div class="range-track">
+                  @let w52pos = week52Position(stock);
+                  @if (w52pos !== null) {
+                    <div class="range-fill" [style.width.%]="w52pos"></div>
+                    <div class="price-marker" [style.left.%]="w52pos">
+                      <div class="marker-dot"></div>
+                      <div class="marker-line"></div>
+                    </div>
+                  }
+                </div>
+                <span class="range-edge">${{ stock.analyst!.metrics!.week52High | number:'1.0-0' }}</span>
+              </div>
+            </div>
+          }
+
+          <!-- Analyst target range bar -->
+          @if (stock.analyst?.priceTarget?.targetMean) {
+            <div class="range-section">
+              <div class="range-header">
+                <span class="range-label-title">Analyst Price Target</span>
+                @if (stock.price !== null) {
+                  <span class="range-current">${{ stock.price | number:'1.2-2' }}</span>
+                }
+              </div>
+              <div class="range-bar-wrap">
+                <span class="range-edge">${{ stock.analyst!.priceTarget!.targetLow | number:'1.0-0' }}</span>
+                <div class="range-track">
+                  @let tpos = targetPosition(stock);
+                  @if (tpos !== null) {
+                    <div class="range-fill target-fill" [style.width.%]="tpos"></div>
+                    <div class="price-marker" [style.left.%]="tpos">
+                      <div class="marker-dot"></div>
+                    </div>
+                  }
+                  @let tmp = targetMeanPosition(stock);
+                  @if (tmp !== null) {
+                    <div class="mean-marker" [style.left.%]="tmp" title="Mean"></div>
+                  }
+                </div>
+                <span class="range-edge">${{ stock.analyst!.priceTarget!.targetHigh | number:'1.0-0' }}</span>
+              </div>
+              <div class="range-legend">
+                <span class="legend-mean">&#9646; Mean ${{ stock.analyst!.priceTarget!.targetMean | number:'1.2-2' }}</span>
+                <span class="legend-median">Median ${{ stock.analyst!.priceTarget!.targetMedian | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          }
+
+          <!-- Other metrics -->
+          <div class="metrics-strip">
+            @if (stock.analyst?.priceTarget?.targetMean) {
+              <div class="metric-item">
+                <span class="m-label">Avg Target</span>
+                <span class="m-val">${{ stock.analyst!.priceTarget!.targetMean | number:'1.0-0' }}</span>
+                <span class="m-sub">${{ stock.analyst!.priceTarget!.targetLow | number:'1.0-0' }}–${{ stock.analyst!.priceTarget!.targetHigh | number:'1.0-0' }}</span>
+              </div>
+            }
+            @if (stock.analyst?.metrics?.peRatio) {
+              <div class="metric-item">
+                <span class="m-label">P/E</span>
+                <span class="m-val">{{ stock.analyst!.metrics!.peRatio | number:'1.1-1' }}</span>
+              </div>
+            }
+            @if (stock.analyst?.metrics?.marketCap) {
+              <div class="metric-item">
+                <span class="m-label">Mkt Cap</span>
+                <span class="m-val">{{ formatMarketCap(stock.analyst!.metrics!.marketCap) }}</span>
+              </div>
+            }
+            @if (stock.analyst?.metrics?.beta) {
+              <div class="metric-item">
+                <span class="m-label">Beta</span>
+                <span class="m-val">{{ stock.analyst!.metrics!.beta | number:'1.2-2' }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="drill-hint">View full chart &#8594;</div>
+      </div>
+    }
+  </div>
+</div>
