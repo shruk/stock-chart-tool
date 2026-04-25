@@ -30,14 +30,14 @@
               <span class="analyst-dot" [class.has-data]="stat.hasAnalyst">{{ stat.hasAnalyst ? '✓' : '✗' }}</span>
             </td>
             <td class="actions-cell">
-              <button class="btn-refresh" (click)="refresh(stat.symbol)">↻ Refresh</button>
-              <button class="btn-analyst" [disabled]="updatingAnalyst().has(stat.symbol)" (click)="updateAnalyst(stat.symbol)">
+              <button class="btn-refresh" title="Fetch missing price bars since last update" (click)="refresh(stat.symbol)">↻ Refresh</button>
+              <button class="btn-analyst" title="Force refresh analyst recommendations and metrics" [disabled]="updatingAnalyst().has(stat.symbol)" (click)="updateAnalyst(stat.symbol)">
                 {{ updatingAnalyst().has(stat.symbol) ? '…' : '⟳ Analyst' }}
               </button>
-              <button class="btn-delete-data" [disabled]="deletingData().has(stat.symbol)" (click)="deleteData(stat.symbol)">
+              <button class="btn-delete-data" title="Delete all price bars and analyst data — symbol stays tracked" [disabled]="deletingData().has(stat.symbol)" (click)="deleteData(stat.symbol)">
                 {{ deletingData().has(stat.symbol) ? '…' : '✕ Data' }}
               </button>
-              <button class="btn-delete" [disabled]="deletingSymbol().has(stat.symbol)" (click)="deleteSymbol(stat.symbol)">
+              <button class="btn-delete" title="Remove symbol and all its data permanently" [disabled]="deletingSymbol().has(stat.symbol)" (click)="deleteSymbol(stat.symbol)">
                 {{ deletingSymbol().has(stat.symbol) ? '…' : '✕ Symbol' }}
               </button>
             </td>
