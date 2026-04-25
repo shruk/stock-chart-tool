@@ -2,9 +2,11 @@
   <header class="header">
     <h1 class="title">Stock Dashboard</h1>
     <div class="header-actions">
-      <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
-        {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
-      </button>
+      @if (auth.isAdmin()) {
+        <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
+          {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
+        </button>
+      }
       @if (auth.isAdmin()) {
         <button class="admin-btn" (click)="openAdmin()">&#9881; Symbols</button>
         <div class="user-info">
