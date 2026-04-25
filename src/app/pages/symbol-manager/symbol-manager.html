@@ -1,0 +1,66 @@
+<div class="admin">
+  <header class="admin-header">
+    <button class="back-btn" (click)="goBack()">← Dashboard</button>
+    <h1>Symbol Manager</h1>
+    <button class="btn-reload" (click)="loadStats()">↻ Reload</button>
+  </header>
+
+  @if (loading()) {
+    <div class="loading">Loading symbol stats...</div>
+  } @else {
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Bars</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Analyst Data</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (stat of stats(); track stat.symbol) {
+          <tr>
+            <td class="sym">{{ stat.symbol }}</td>
+            <td>{{ stat.barCount | number }}</td>
+            <td>{{ stat.fromDate }}</td>
+            <td>{{ stat.toDate }}</td>
+            <td class="analyst-cell">
+              <span class="analyst-dot" [class.has-data]="stat.hasAnalyst">{{ stat.hasAnalyst ? '✓' : '✗' }}</span>
+            </td>
+            <td>
+              <button class="btn-refresh" (click)="refresh(stat.symbol)">↻ Refresh</button>
+            </td>
+          </tr>
+        }
+        @if (stats().length === 0) {
+          <tr>
+            <td colspan="6" class="empty">No symbols loaded yet. Add one below.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  <div class="add-row">
+    <input
+      class="sym-input"
+      [value]="newSymbol()"
+      (input)="newSymbol.set($any($event.target).value.toUpperCase())"
+      (keydown.enter)="addSymbol()"
+      placeholder="Symbol  e.g. NVDA"
+    />
+    <button class="btn-add" [disabled]="adding() || !newSymbol()" (click)="addSymbol()">
+      {{ adding() ? 'Loading…' : '+ Add & Backfill' }}
+    </button>
+  </div>
+
+  <div class="messages">
+    @for (msg of messages(); track $index) {
+      <div class="msg" [class.ok]="msg.ok" [class.err]="!msg.ok">
+        <strong>{{ msg.symbol }}</strong> — {{ msg.text }}
+      </div>
+    }
+  </div>
+</div>

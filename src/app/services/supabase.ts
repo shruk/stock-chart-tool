@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
+import { Bar } from './polygon';
 import { AnalystData } from './finnhub';
 
 @Injectable({ providedIn: 'root' })
@@ -21,15 +22,23 @@ export class SupabaseService {
     return data.data as AnalystData;
   }
 
-  async getPriceBars(symbol: string, timeframe: string): Promise<any[] | null> {
+  async getPriceBars(symbol: string, fromDate: string): Promise<Bar[] | null> {
     const { data, error } = await this.client
-      .from('price_cache')
-      .select('bars')
+      .from('price_bars')
+      .select('ts, open, high, low, close, volume')
       .eq('symbol', symbol.toUpperCase())
-      .eq('timeframe', timeframe)
-      .single();
+      .gte('ts', fromDate)
+      .order('ts', { ascending: true });
 
-    if (error || !data) return null;
-    return data.bars;
+    if (error || !data?.length) return null;
+
+    return data.map(r => ({
+      time: Math.floor(new Date(r.ts + 'T00:00:00Z').getTime() / 1000),
+      open: r.open,
+      high: r.high,
+      low: r.low,
+      close: r.close,
+      volume: r.volume
+    }));
   }
 }

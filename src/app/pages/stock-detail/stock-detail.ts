@@ -62,7 +62,7 @@ export class StockDetailComponent implements OnInit {
     this.loading.set(true);
     this.error.set('');
 
-    const bars = await this.supabaseSvc.getPriceBars(sym, timeframe);
+    const bars = await this.supabaseSvc.getPriceBars(sym, this.getFromDate(timeframe));
     if (bars?.length) {
       this.bars.set(bars);
     } else {
@@ -112,4 +112,13 @@ export class StockDetailComponent implements OnInit {
   }
 
   goBack() { this.router.navigate(['/']); }
+
+  private getFromDate(timeframe: string): string {
+    const d = new Date();
+    const days: Record<string, number> = { '1D': 1, '1W': 7, '1M': 30, '3M': 90, '6M': 180, '1Y': 365 };
+    const years: Record<string, number> = { '2Y': 2, '5Y': 5, '10Y': 10 };
+    if (years[timeframe]) d.setFullYear(d.getFullYear() - years[timeframe]);
+    else d.setDate(d.getDate() - (days[timeframe] ?? 90));
+    return d.toISOString().split('T')[0];
+  }
 }

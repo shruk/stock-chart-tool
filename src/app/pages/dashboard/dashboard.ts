@@ -71,7 +71,7 @@ export class DashboardComponent implements OnInit {
 
     WATCHLIST.forEach(w => {
       // Load prices from Supabase
-      this.supabaseSvc.getPriceBars(w.symbol, '3M').then(bars => {
+      this.supabaseSvc.getPriceBars(w.symbol, this.fromDate(90)).then(bars => {
         if (bars?.length) {
           this.stocks.update(list => list.map(s =>
             s.symbol === w.symbol ? { ...s, ...this.summarize(bars), loading: false } : s
@@ -179,6 +179,12 @@ export class DashboardComponent implements OnInit {
     return `$${val.toFixed(0)}M`;
   }
 
+  private fromDate(days: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    return d.toISOString().split('T')[0];
+  }
+
   private summarize(bars: Bar[]): Pick<StockCard, 'price' | 'change' | 'changePct' | 'sparkline'> {
     if (bars.length < 2) return { price: null, change: null, changePct: null, sparkline: [] };
     const last = bars[bars.length - 1];
@@ -188,7 +194,6 @@ export class DashboardComponent implements OnInit {
     return { price: last.close, change, changePct: (change / prev.close) * 100, sparkline };
   }
 
-  openStock(symbol: string) {
-    this.router.navigate(['/stock', symbol]);
-  }
+  openStock(symbol: string) { this.router.navigate(['/stock', symbol]); }
+  openAdmin() { this.router.navigate(['/admin']); }
 }
