@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, effect } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { Bar } from '../../services/polygon';
@@ -41,7 +41,14 @@ export class DashboardComponent implements OnInit {
   stocks = signal<StockCard[]>([]);
   loadingSymbols = signal(true);
 
-  ngOnInit() { this.loadSymbols(); }
+  constructor() {
+    effect(() => {
+      this.auth.role();
+      this.loadSymbols();
+    });
+  }
+
+  ngOnInit() {}
 
   toggleTestMode() {
     const next = !this.testMode();
