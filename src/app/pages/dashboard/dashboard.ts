@@ -6,7 +6,6 @@ import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
 import { FunctionsService } from '../../services/functions.service';
 import { MockDataService } from '../../services/mock-data';
-import { SettingsPanelComponent } from '../../components/settings-panel/settings-panel';
 import { SparklineComponent } from '../../components/sparkline/sparkline';
 
 interface StockCard {
@@ -26,7 +25,7 @@ interface StockCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [SettingsPanelComponent, SparklineComponent, DecimalPipe],
+  imports: [SparklineComponent, DecimalPipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
