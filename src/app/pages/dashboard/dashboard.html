@@ -6,7 +6,7 @@
         {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
       </button>
       @if (!testMode()) {
-        <button class="refresh-btn" (click)="loadAll(false)">&#8635; Refresh</button>
+        <button class="refresh-btn" (click)="loadSymbols()">&#8635; Refresh</button>
       }
       <button class="admin-btn" (click)="openAdmin()">&#9881; Symbols</button>
       <app-settings-panel />
@@ -15,6 +15,11 @@
 
   @if (testMode()) {
     <div class="test-banner">Test Mode — displaying generated fake data. No API key required.</div>
+  }
+  @if (loadingSymbols()) {
+    <div class="loading-symbols">Loading symbols…</div>
+  } @else if (stocks().length === 0) {
+    <div class="loading-symbols">No symbols tracked yet. Add some in <button class="link-btn" (click)="openAdmin()">Symbol Manager</button>.</div>
   }
   <div class="grid">
     @for (stock of stocks(); track stock.symbol) {

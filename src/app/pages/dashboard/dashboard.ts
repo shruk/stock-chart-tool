@@ -21,13 +21,6 @@ interface StockCard {
   analystLoading: boolean;
 }
 
-const WATCHLIST = [
-  { symbol: 'AAPL', name: 'Apple Inc.' },
-  { symbol: 'MSFT', name: 'Microsoft Corp.' },
-  { symbol: 'GOOGL', name: 'Alphabet Inc.' },
-  { symbol: 'AMZN', name: 'Amazon.com Inc.' },
-  { symbol: 'TSLA', name: 'Tesla Inc.' },
-];
 
 @Component({
   selector: 'app-dashboard',
@@ -42,54 +35,61 @@ export class DashboardComponent implements OnInit {
   private mockDataSvc = inject(MockDataService);
 
   testMode = signal(false);
-  stocks = signal<StockCard[]>(
-    WATCHLIST.map(s => ({ ...s, price: null, change: null, changePct: null, sparkline: [], loading: true, error: '', analyst: null, analystLoading: true }))
-  );
+  stocks = signal<StockCard[]>([]);
+  loadingSymbols = signal(true);
 
-  ngOnInit() { this.loadAll(false); }
+  ngOnInit() { this.loadSymbols(); }
 
   toggleTestMode() {
     const next = !this.testMode();
     this.testMode.set(next);
-    this.loadAll(next);
+    if (next) this.loadMockData();
+    else this.loadSymbols();
   }
 
-  loadAll(test: boolean) {
-    this.stocks.update(list => list.map(s => ({
-      ...s, loading: true, error: '', analyst: null, analystLoading: !test
+  async loadSymbols() {
+    this.loadingSymbols.set(true);
+    const symbols = await this.supabaseSvc.getSymbols();
+    this.stocks.set(symbols.map(symbol => ({
+      symbol, name: symbol,
+      price: null, change: null, changePct: null, sparkline: [],
+      loading: true, error: '', analyst: null, analystLoading: true
     })));
+    this.loadingSymbols.set(false);
+    symbols.forEach(symbol => this.loadStock(symbol));
+  }
 
-    if (test) {
-      this.stocks.update(list => list.map(s => {
-        const bars = this.mockDataSvc.generate('3M');
-        const summary = this.summarize(bars);
-        const analyst = this.mockDataSvc.generateAnalyst(summary.price ?? 150);
-        return { ...s, ...summary, loading: false, analyst, analystLoading: false };
-      }));
-      return;
-    }
-
-    WATCHLIST.forEach(w => {
-      // Load prices from Supabase
-      this.supabaseSvc.getPriceBars(w.symbol, this.fromDate(90)).then(bars => {
-        if (bars?.length) {
-          this.stocks.update(list => list.map(s =>
-            s.symbol === w.symbol ? { ...s, ...this.summarize(bars), loading: false } : s
-          ));
-        } else {
-          this.stocks.update(list => list.map(s =>
-            s.symbol === w.symbol ? { ...s, loading: false, error: 'No data available' } : s
-          ));
-        }
-      });
-
-      // Load analyst data from Supabase
-      this.supabaseSvc.getAnalystData(w.symbol).then(data => {
+  private loadStock(symbol: string) {
+    this.supabaseSvc.getPriceBars(symbol, this.fromDate(90)).then(bars => {
+      if (bars?.length) {
         this.stocks.update(list => list.map(s =>
-          s.symbol === w.symbol ? { ...s, analyst: data, analystLoading: false } : s
+          s.symbol === symbol ? { ...s, ...this.summarize(bars), loading: false } : s
         ));
-      });
+      } else {
+        this.stocks.update(list => list.map(s =>
+          s.symbol === symbol ? { ...s, loading: false, error: 'No data' } : s
+        ));
+      }
     });
+
+    this.supabaseSvc.getAnalystData(symbol).then(data => {
+      this.stocks.update(list => list.map(s =>
+        s.symbol === symbol ? {
+          ...s,
+          analyst: data,
+          analystLoading: false,
+          name: data?.profile?.name || s.symbol
+        } : s
+      ));
+    });
+  }
+
+  private loadMockData() {
+    this.stocks.update(list => list.map(s => {
+      const bars = this.mockDataSvc.generate('3M');
+      const summary = this.summarize(bars);
+      return { ...s, ...summary, loading: false, analyst: this.mockDataSvc.generateAnalyst(summary.price ?? 150), analystLoading: false };
+    }));
   }
 
   consensus(card: StockCard): { text: string; cls: string } | null {

@@ -11,6 +11,16 @@ export class SupabaseService {
     environment.supabaseAnonKey
   );
 
+  async getSymbols(): Promise<string[]> {
+    const { data, error } = await this.client
+      .from('symbols')
+      .select('symbol')
+      .order('symbol', { ascending: true });
+
+    if (error || !data) return [];
+    return data.map(r => r.symbol as string);
+  }
+
   async getAnalystData(symbol: string): Promise<AnalystData | null> {
     const { data, error } = await this.client
       .from('analyst_cache')

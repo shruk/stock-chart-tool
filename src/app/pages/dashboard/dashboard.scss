@@ -6,6 +6,22 @@
   flex-direction: column;
 }
 
+.loading-symbols {
+  padding: 40px 24px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
+}
+
 .header {
   display: flex;
   align-items: center;
