@@ -50,11 +50,14 @@ export class DashboardComponent implements OnInit {
     else this.loadSymbols();
   }
 
+  private readonly GUEST_SYMBOLS = ['QQQ', 'AAPL', 'MSFT'];
+
   loadSymbols() {
     this.loadingSymbols.set(true);
     this.functionsSvc.getSymbolStats().subscribe({
       next: stats => {
-        const symbols = stats.map(s => s.symbol);
+        const all = stats.map(s => s.symbol);
+        const symbols = this.auth.isMember() ? all : all.filter(s => this.GUEST_SYMBOLS.includes(s));
         this.stocks.set(symbols.map(symbol => ({
           symbol, name: symbol,
           price: null, change: null, changePct: null, sparkline: [],
