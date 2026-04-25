@@ -7,13 +7,17 @@
       </button>
       @if (auth.isAdmin()) {
         <button class="admin-btn" (click)="openAdmin()">&#9881; Symbols</button>
-      }
-      @if (auth.isLoggedIn()) {
+        <div class="user-info">
+          <span class="user-email">{{ auth.user()?.email }}</span>
+          <button class="signout-btn" (click)="auth.signOut()">Sign out</button>
+        </div>
+      } @else if (auth.isLoggedIn()) {
         <div class="user-info">
           <span class="user-email">{{ auth.user()?.email }}</span>
           <button class="signout-btn" (click)="auth.signOut()">Sign out</button>
         </div>
       } @else {
+        <span class="user-email">Welcome, Guest</span>
         <button class="signin-btn" (click)="openLogin()">Sign in</button>
       }
     </div>
