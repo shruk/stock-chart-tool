@@ -18,6 +18,9 @@ export class SymbolManagerComponent implements OnInit {
   loading = signal(true);
   newSymbol = signal('');
   adding = signal(false);
+  deletingData = signal<Set<string>>(new Set());
+  deletingSymbol = signal<Set<string>>(new Set());
+  updatingAnalyst = signal<Set<string>>(new Set());
   messages = signal<{ symbol: string; text: string; ok: boolean }[]>([]);
 
   ngOnInit() { this.loadStats(); }
@@ -55,6 +58,53 @@ export class SymbolManagerComponent implements OnInit {
         this.loadStats();
       },
       error: () => this.messages.update(m => [{ symbol, text: 'Failed', ok: false }, ...m])
+    });
+  }
+
+  updateAnalyst(symbol: string) {
+    this.updatingAnalyst.update(s => new Set(s).add(symbol));
+    this.functionsSvc.updateAnalyst(symbol).subscribe({
+      next: () => {
+        this.messages.update(m => [{ symbol, text: 'Analyst data updated', ok: true }, ...m]);
+        this.updatingAnalyst.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+        this.loadStats();
+      },
+      error: () => {
+        this.messages.update(m => [{ symbol, text: 'Analyst update failed', ok: false }, ...m]);
+        this.updatingAnalyst.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+      }
+    });
+  }
+
+  deleteData(symbol: string) {
+    if (!confirm(`Delete all price + analyst data for ${symbol}? The symbol will remain tracked.`)) return;
+    this.deletingData.update(s => new Set(s).add(symbol));
+    this.functionsSvc.deleteData(symbol).subscribe({
+      next: () => {
+        this.messages.update(m => [{ symbol, text: 'Data deleted — symbol kept', ok: true }, ...m]);
+        this.deletingData.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+        this.loadStats();
+      },
+      error: () => {
+        this.messages.update(m => [{ symbol, text: 'Delete data failed', ok: false }, ...m]);
+        this.deletingData.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+      }
+    });
+  }
+
+  deleteSymbol(symbol: string) {
+    if (!confirm(`Remove ${symbol} entirely? This deletes all data and the symbol itself.`)) return;
+    this.deletingSymbol.update(s => new Set(s).add(symbol));
+    this.functionsSvc.deleteSymbol(symbol).subscribe({
+      next: () => {
+        this.messages.update(m => [{ symbol, text: 'Symbol removed', ok: true }, ...m]);
+        this.deletingSymbol.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+        this.loadStats();
+      },
+      error: () => {
+        this.messages.update(m => [{ symbol, text: 'Delete symbol failed', ok: false }, ...m]);
+        this.deletingSymbol.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+      }
     });
   }
 

@@ -23,4 +23,16 @@ export class FunctionsService {
   backfillSymbol(symbol: string): Observable<{ symbol: string; barsAdded: number; status: string }> {
     return this.http.post<any>(`${this.base}/symbols`, { symbol });
   }
+
+  updateAnalyst(symbol: string): Observable<{ symbol: string; status: string }> {
+    return this.http.post<any>(`${this.base}/symbols/${symbol}/analyst`, {});
+  }
+
+  deleteData(symbol: string): Observable<{ symbol: string; status: string }> {
+    return this.http.delete<any>(`${this.base}/symbols/${symbol}/data`);
+  }
+
+  deleteSymbol(symbol: string): Observable<{ symbol: string; status: string }> {
+    return this.http.delete<any>(`${this.base}/symbols/${symbol}`);
+  }
 }

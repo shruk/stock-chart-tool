@@ -85,6 +85,12 @@
   }
 }
 
+.actions-cell {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
 .btn-refresh {
   background: transparent;
   color: #64748b;
@@ -94,6 +100,42 @@
   cursor: pointer;
   font-size: 0.75rem;
   &:hover { color: #f1f5f9; border-color: #64748b; }
+}
+
+.btn-analyst {
+  background: transparent;
+  color: #a78bfa;
+  border: 1px solid #4c1d95;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  &:hover:not(:disabled) { background: #4c1d9533; border-color: #a78bfa; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.btn-delete-data {
+  background: transparent;
+  color: #fb923c;
+  border: 1px solid #7c2d12;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  &:hover:not(:disabled) { background: #7c2d1233; border-color: #fb923c; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.btn-delete {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #7f1d1d;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  &:hover:not(:disabled) { background: #7f1d1d33; border-color: #ef4444; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 
 .add-row {
