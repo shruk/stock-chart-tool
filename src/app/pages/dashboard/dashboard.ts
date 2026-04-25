@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Bar } from '../../services/polygon';
 import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
+import { FunctionsService } from '../../services/functions.service';
 import { MockDataService } from '../../services/mock-data';
 import { SettingsPanelComponent } from '../../components/settings-panel/settings-panel';
 import { SparklineComponent } from '../../components/sparkline/sparkline';
@@ -32,6 +33,7 @@ interface StockCard {
 export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private supabaseSvc = inject(SupabaseService);
+  private functionsSvc = inject(FunctionsService);
   private mockDataSvc = inject(MockDataService);
 
   testMode = signal(false);
@@ -47,16 +49,21 @@ export class DashboardComponent implements OnInit {
     else this.loadSymbols();
   }
 
-  async loadSymbols() {
+  loadSymbols() {
     this.loadingSymbols.set(true);
-    const symbols = await this.supabaseSvc.getSymbols();
-    this.stocks.set(symbols.map(symbol => ({
-      symbol, name: symbol,
-      price: null, change: null, changePct: null, sparkline: [],
-      loading: true, error: '', analyst: null, analystLoading: true
-    })));
-    this.loadingSymbols.set(false);
-    symbols.forEach(symbol => this.loadStock(symbol));
+    this.functionsSvc.getSymbolStats().subscribe({
+      next: stats => {
+        const symbols = stats.map(s => s.symbol);
+        this.stocks.set(symbols.map(symbol => ({
+          symbol, name: symbol,
+          price: null, change: null, changePct: null, sparkline: [],
+          loading: true, error: '', analyst: null, analystLoading: true
+        })));
+        this.loadingSymbols.set(false);
+        symbols.forEach(symbol => this.loadStock(symbol));
+      },
+      error: () => this.loadingSymbols.set(false)
+    });
   }
 
   private loadStock(symbol: string) {
