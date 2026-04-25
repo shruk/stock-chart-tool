@@ -8,7 +8,17 @@
       @if (!testMode()) {
         <button class="refresh-btn" (click)="loadSymbols()">&#8635; Refresh</button>
       }
-      <button class="admin-btn" (click)="openAdmin()">&#9881; Symbols</button>
+      @if (auth.isAdmin()) {
+        <button class="admin-btn" (click)="openAdmin()">&#9881; Symbols</button>
+      }
+      @if (auth.isLoggedIn()) {
+        <div class="user-info">
+          <span class="user-email">{{ auth.user()?.email }}</span>
+          <button class="signout-btn" (click)="auth.signOut()">Sign out</button>
+        </div>
+      } @else {
+        <button class="signin-btn" (click)="openLogin()">Sign in</button>
+      }
     </div>
   </header>
 
@@ -22,7 +32,7 @@
   }
   <div class="grid">
     @for (stock of stocks(); track stock.symbol) {
-      <div class="card" (click)="openStock(stock.symbol)">
+      <div class="card" [class.clickable]="auth.isMember()" (click)="auth.isMember() && openStock(stock.symbol)">
 
         <!-- Top: symbol / name / price -->
         <div class="card-top">
@@ -195,7 +205,11 @@
           </div>
         }
 
-        <div class="drill-hint">View full chart &#8594;</div>
+        @if (auth.isMember()) {
+          <div class="drill-hint">View full chart &#8594;</div>
+        } @else {
+          <div class="drill-hint guest">Sign in to view full chart &#8594;</div>
+        }
       </div>
     }
   </div>

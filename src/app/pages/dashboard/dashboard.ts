@@ -6,6 +6,7 @@ import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
 import { FunctionsService } from '../../services/functions.service';
 import { MockDataService } from '../../services/mock-data';
+import { AuthService } from '../../services/auth.service';
 import { SparklineComponent } from '../../components/sparkline/sparkline';
 
 interface StockCard {
@@ -34,6 +35,7 @@ export class DashboardComponent implements OnInit {
   private supabaseSvc = inject(SupabaseService);
   private functionsSvc = inject(FunctionsService);
   private mockDataSvc = inject(MockDataService);
+  auth = inject(AuthService);
 
   testMode = signal(false);
   stocks = signal<StockCard[]>([]);
@@ -202,4 +204,5 @@ export class DashboardComponent implements OnInit {
 
   openStock(symbol: string) { this.router.navigate(['/stock', symbol]); }
   openAdmin() { this.router.navigate(['/admin']); }
+  openLogin() { this.router.navigate(['/login']); }
 }
