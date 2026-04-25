@@ -170,7 +170,13 @@ export class DashboardComponent implements OnInit {
     if (!t?.targetHigh || !t?.targetLow || !price) return null;
     const range = t.targetHigh - t.targetLow;
     if (range <= 0) return null;
-    return Math.max(0, Math.min(100, ((price - t.targetLow) / range) * 100));
+    return ((price - t.targetLow) / range) * 100;
+  }
+
+  targetFillWidth(card: StockCard): number | null {
+    const pos = this.targetPosition(card);
+    if (pos === null) return null;
+    return Math.max(0, Math.min(100, pos));
   }
 
   targetMeanPosition(card: StockCard): number | null {

@@ -158,8 +158,9 @@
                 <span class="range-edge">${{ stock.analyst!.priceTarget!.targetLow | number:'1.0-0' }}</span>
                 <div class="range-track">
                   @let tpos = targetPosition(stock);
-                  @if (tpos !== null) {
-                    <div class="range-fill target-fill" [style.width.%]="tpos"></div>
+                  @let tfill = targetFillWidth(stock);
+                  @if (tpos !== null && tfill !== null) {
+                    <div class="range-fill target-fill" [style.width.%]="tfill"></div>
                     <div class="price-marker" [style.left.%]="tpos">
                       <div class="marker-dot"></div>
                     </div>
