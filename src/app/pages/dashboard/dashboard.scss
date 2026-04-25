@@ -64,7 +64,7 @@
     &:hover { color: #f1f5f9; border-color: #64748b; }
   }
 
-  .test-mode-btn, .refresh-btn {
+  .test-mode-btn {
     background: transparent;
     border: 1px solid #334155;
     color: #94a3b8;
@@ -76,7 +76,6 @@
   }
   .test-mode-btn:hover { border-color: #f59e0b; color: #f59e0b; }
   .test-mode-btn.active { background: #78350f; border-color: #f59e0b; color: #fcd34d; }
-  .refresh-btn:hover { border-color: #3b82f6; color: #e2e8f0; }
 }
 
 .test-banner {

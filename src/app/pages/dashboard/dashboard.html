@@ -5,9 +5,6 @@
       <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
         {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
       </button>
-      @if (!testMode()) {
-        <button class="refresh-btn" (click)="loadSymbols()">&#8635; Refresh</button>
-      }
       @if (auth.isAdmin()) {
         <button class="admin-btn" (click)="openAdmin()">&#9881; Symbols</button>
       }
