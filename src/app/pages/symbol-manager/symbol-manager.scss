@@ -1,7 +1,7 @@
 .admin {
   min-height: 100vh;
-  background: #0f172a;
-  color: #f1f5f9;
+  background: #f8fafc;
+  color: #0f172a;
   padding: 24px;
   font-family: 'Inter', sans-serif;
 }
@@ -16,22 +16,23 @@
     margin: 0;
     font-size: 1.4rem;
     flex: 1;
+    color: #0f172a;
   }
 }
 
 .back-btn, .btn-reload {
-  background: #1e293b;
-  color: #94a3b8;
-  border: 1px solid #334155;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
   padding: 8px 14px;
   cursor: pointer;
   font-size: 0.875rem;
-  &:hover { color: #f1f5f9; border-color: #64748b; }
+  &:hover { color: #0f172a; border-color: #94a3b8; }
 }
 
 .loading {
-  color: #64748b;
+  color: #94a3b8;
   padding: 32px 0;
 }
 
@@ -43,32 +44,33 @@
   th {
     text-align: left;
     padding: 10px 16px;
-    color: #64748b;
+    color: #94a3b8;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    border-bottom: 1px solid #1e293b;
+    border-bottom: 1px solid #e2e8f0;
   }
 
   td {
     padding: 12px 16px;
-    border-bottom: 1px solid #1e293b;
+    border-bottom: 1px solid #f1f5f9;
     font-size: 0.875rem;
+    color: #1e293b;
 
     &.sym {
       font-weight: 700;
-      color: #38bdf8;
+      color: #3b82f6;
       letter-spacing: 0.04em;
     }
 
     &.empty {
-      color: #64748b;
+      color: #94a3b8;
       text-align: center;
       padding: 40px;
     }
   }
 
-  tr:hover td { background: #1e293b44; }
+  tr:hover td { background: #f8fafc; }
 }
 
 .analyst-cell, th:nth-child(5) {
@@ -79,9 +81,9 @@
   .analyst-dot {
     font-size: 1rem;
     font-weight: 700;
-    color: #ef4444;
+    color: #dc2626;
 
-    &.has-data { color: #4ade80; }
+    &.has-data { color: #16a34a; }
   }
 }
 
@@ -94,47 +96,47 @@
 .btn-refresh {
   background: transparent;
   color: #64748b;
-  border: 1px solid #334155;
+  border: 1px solid #e2e8f0;
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
   font-size: 0.75rem;
-  &:hover { color: #f1f5f9; border-color: #64748b; }
+  &:hover { color: #0f172a; border-color: #94a3b8; }
 }
 
 .btn-analyst {
   background: transparent;
-  color: #a78bfa;
-  border: 1px solid #4c1d95;
+  color: #7c3aed;
+  border: 1px solid #ddd6fe;
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
   font-size: 0.75rem;
-  &:hover:not(:disabled) { background: #4c1d9533; border-color: #a78bfa; }
+  &:hover:not(:disabled) { background: #f5f3ff; border-color: #7c3aed; }
   &:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 
 .btn-delete-data {
   background: transparent;
-  color: #fb923c;
-  border: 1px solid #7c2d12;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
   font-size: 0.75rem;
-  &:hover:not(:disabled) { background: #7c2d1233; border-color: #fb923c; }
+  &:hover:not(:disabled) { background: #fff7ed; border-color: #ea580c; }
   &:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 
 .btn-delete {
   background: transparent;
-  color: #ef4444;
-  border: 1px solid #7f1d1d;
+  color: #dc2626;
+  border: 1px solid #fecaca;
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
   font-size: 0.75rem;
-  &:hover:not(:disabled) { background: #7f1d1d33; border-color: #ef4444; }
+  &:hover:not(:disabled) { background: #fef2f2; border-color: #dc2626; }
   &:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 
@@ -145,21 +147,21 @@
 }
 
 .sym-input {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
-  color: #f1f5f9;
+  color: #0f172a;
   padding: 10px 14px;
   font-size: 0.875rem;
   width: 200px;
   text-transform: uppercase;
 
-  &::placeholder { color: #475569; text-transform: none; }
-  &:focus { outline: none; border-color: #38bdf8; }
+  &::placeholder { color: #94a3b8; text-transform: none; }
+  &:focus { outline: none; border-color: #3b82f6; }
 }
 
 .btn-add {
-  background: #0ea5e9;
+  background: #3b82f6;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -168,7 +170,7 @@
   font-weight: 600;
   cursor: pointer;
 
-  &:hover:not(:disabled) { background: #38bdf8; }
+  &:hover:not(:disabled) { background: #2563eb; }
   &:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 
@@ -185,14 +187,14 @@
   font-size: 0.875rem;
 
   &.ok {
-    background: #14532d33;
-    color: #4ade80;
-    border: 1px solid #166534;
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
   }
 
   &.err {
-    background: #7f1d1d33;
-    color: #f87171;
-    border: 1px solid #991b1b;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
   }
 }

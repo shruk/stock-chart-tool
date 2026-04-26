@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm start *)",
+      "Bash(func start *)",
+      "Bash(where func *)",
+      "Bash(powershell -Command \"Get-Command func -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
+      "PowerShell(Get-Command func -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command func.cmd -ErrorAction SilentlyContinue)",
+      "PowerShell($paths = @\\(\"$env:APPDATA\\\\npm\\\\func.cmd\", \"$env:ProgramFiles\\\\Microsoft\\\\Azure Functions Core Tools\\\\func.exe\", \"${env:ProgramFiles\\(x86\\)}\\\\Microsoft\\\\Azure Functions Core Tools\\\\func.exe\", \"$env:LOCALAPPDATA\\\\AzureFunctionsTools\\\\Releases\"\\); foreach \\($p in $paths\\) { if \\(Test-Path $p\\) { Write-Output \"Found: $p\" } })",
+      "PowerShell(Test-Path \"$env:APPDATA\\\\npm\"; ls \"$env:APPDATA\\\\npm\" | Select-Object Name | head)",
+      "PowerShell(Get-ChildItem \"$env:APPDATA\\\\npm\" | Select-Object -First 20 -ExpandProperty Name)",
+      "Bash(npx --yes ng serve)",
+      "PowerShell(dotnet tool list -g 2>$null)",
+      "Bash(npm install *)",
+      "Bash(node_modules/.bin/ng serve *)",
+      "PowerShell(npm install -g azure-functions-core-tools@4 --unsafe-perm true 2>&1)",
+      "Bash(az functionapp *)",
+      "Bash(az staticwebapp *)",
+      "Bash(node_modules/.bin/ng build *)",
+      "Bash(npx --yes @azure/static-web-apps-cli@latest deploy dist/stock-chart-tool/browser --deployment-token \"1d95c5d8830809477e54caed134f31daf89a46fda2aa7210fb1817faf4e7665c07-8e5e691c-b2e0-405a-9888-98d555fa5984000161301c074400\" --env production)",
+      "PowerShell(npm install -g @azure/static-web-apps-cli 2>&1)",
+      "Bash(curl -s http://localhost:4200)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(curl -s 'https://hlpxazrnyryecmuqsxsw.supabase.co/rest/v1/symbols?select=symbol&order=symbol' -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhscHhhenJueXJ5ZWNtdXFzeHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjcyOTAsImV4cCI6MjA5MjU0MzI5MH0.dPUIgMqKNxruXm_0c3ys_CULnOSeDK30mtLab-YYMSw' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhscHhhenJueXJ5ZWNtdXFzeHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NjcyOTAsImV4cCI6MjA5MjU0MzI5MH0.dPUIgMqKNxruXm_0c3ys_CULnOSeDK30mtLab-YYMSw')",
+      "Bash(curl -s http://localhost:7071/api/symbols)",
+      "Bash(node_modules/.bin/ng config *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d['projects']['stock-chart-tool']['architect']['build']['configurations']['production'], indent=2\\)\\)\")",
+      "Read(//c/Users/yeyon/source/**)",
+      "Bash(npx create-expo-app@latest stock-chart-tool-ui --template blank-typescript)",
+      "Bash(npx expo *)",
+      "Bash(echo \"PID: $!\")",
+      "Read(//tmp/**)",
+      "Bash(kill 841)",
+      "Bash(az account *)",
+      "Bash(npx @azure/static-web-apps-cli deploy ./dist --deployment-token dd7f8394b3cda4e2d6fe264fe0ed7baab774bf92b3e7a02651662b0d3fdc87cb07-46743707-7809-4b3a-a2ce-8d074fa3878900f19010c2d0160f --env production)",
+      "Bash(npx @azure/static-web-apps-cli deploy ./dist/stock-chart-tool/browser --deployment-token 1d95c5d8830809477e54caed134f31daf89a46fda2aa7210fb1817faf4e7665c07-8e5e691c-b2e0-405a-9888-98d555fa5984000161301c074400 --env production)"
+    ]
+  }
+}

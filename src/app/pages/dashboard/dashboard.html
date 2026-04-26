@@ -1,6 +1,6 @@
 <div class="app">
   <header class="header">
-    <h1 class="title">Stock Dashboard</h1>
+    <h1 class="title">Admin Dashboard</h1>
     <div class="header-actions">
       @if (auth.isAdmin()) {
         <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
@@ -84,7 +84,7 @@
             <div class="donut-wrap">
               <svg viewBox="0 0 96 96" width="96" height="96">
                 <!-- Track -->
-                <circle cx="48" cy="48" r="36" fill="none" stroke="#1e293b" stroke-width="12"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#e2e8f0" stroke-width="12"/>
                 <!-- Segments -->
                 <g transform="rotate(-90 48 48)">
                   @for (seg of donutSegments(stock) ?? []; track $index) {
@@ -100,9 +100,9 @@
                 </g>
                 <!-- Center label -->
                 @if (consensus(stock); as c) {
-                  <text x="48" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#f1f5f9">{{ c.text }}</text>
+                  <text x="48" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#0f172a">{{ c.text }}</text>
                 }
-                <text x="48" y="57" text-anchor="middle" font-size="8" fill="#64748b">{{ totalRatings(stock) }} analysts</text>
+                <text x="48" y="57" text-anchor="middle" font-size="8" fill="#94a3b8">{{ totalRatings(stock) }} analysts</text>
               </svg>
 
               <div class="donut-legend">

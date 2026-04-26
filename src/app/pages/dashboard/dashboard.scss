@@ -1,21 +1,21 @@
 .app {
   min-height: 100vh;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #f8fafc;
+  color: #1e293b;
   display: flex;
   flex-direction: column;
 }
 
 .loading-symbols {
   padding: 40px 24px;
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.9rem;
 }
 
 .link-btn {
   background: none;
   border: none;
-  color: #38bdf8;
+  color: #3b82f6;
   cursor: pointer;
   font-size: inherit;
   padding: 0;
@@ -27,15 +27,15 @@
   align-items: center;
   gap: 16px;
   padding: 16px 24px;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
 
-  .title { margin: 0; font-size: 20px; font-weight: 600; color: #f1f5f9; }
+  .title { margin: 0; font-size: 20px; font-weight: 600; color: #0f172a; }
 
   .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
   .signin-btn {
-    background: #0ea5e9;
+    background: #3b82f6;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -43,49 +43,55 @@
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    &:hover { background: #38bdf8; }
+    &:hover { background: #2563eb; }
   }
 
   .user-info {
     display: flex;
     align-items: center;
     gap: 10px;
-    .user-email { font-size: 0.8rem; color: #64748b; }
+    .user-email { font-size: 0.8rem; color: #94a3b8; }
   }
 
   .signout-btn {
     background: transparent;
-    border: 1px solid #334155;
-    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
     border-radius: 6px;
     padding: 5px 12px;
     font-size: 0.8rem;
     cursor: pointer;
-    &:hover { color: #f1f5f9; border-color: #64748b; }
+    &:hover { color: #0f172a; border-color: #94a3b8; }
   }
 
   .test-mode-btn {
     background: transparent;
-    border: 1px solid #334155;
-    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
     border-radius: 6px;
     padding: 6px 14px;
     font-size: 13px;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .test-mode-btn:hover { border-color: #f59e0b; color: #f59e0b; }
-  .test-mode-btn.active { background: #78350f; border-color: #f59e0b; color: #fcd34d; }
+  .test-mode-btn:hover { border-color: #f59e0b; color: #d97706; }
+  .test-mode-btn.active { background: #fef3c7; border-color: #f59e0b; color: #d97706; }
+
+  .admin-btn {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    &:hover { color: #0f172a; border-color: #94a3b8; }
+  }
 }
 
 .test-banner {
-  background: #78350f; border-bottom: 1px solid #f59e0b;
-  color: #fcd34d; font-size: 13px; padding: 8px 24px; text-align: center;
-}
-
-.no-key-banner {
-  background: #1e1a0a; border-bottom: 1px solid #92400e;
-  color: #fbbf24; font-size: 13px; padding: 10px 24px; text-align: center;
+  background: #fef3c7; border-bottom: 1px solid #f59e0b;
+  color: #d97706; font-size: 13px; padding: 8px 24px; text-align: center;
 }
 
 /* ── Grid ─────────────────────────────────────── */
@@ -98,8 +104,8 @@
 
 /* ── Card ─────────────────────────────────────── */
 .card {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
   padding: 22px;
   cursor: pointer;
@@ -111,7 +117,7 @@
   &:hover {
     border-color: #3b82f6;
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px #0009;
+    box-shadow: 0 8px 24px #94a3b820;
   }
 }
 
@@ -126,32 +132,32 @@
 .symbol {
   font-size: 24px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #0f172a;
   line-height: 1;
 }
 
 .name {
   font-size: 12px;
-  color: #64748b;
+  color: #94a3b8;
   margin-top: 4px;
 }
 
 .price-block {
   text-align: right;
-  &.up .change { color: #22c55e; }
-  &.down .change { color: #ef4444; }
+  &.up .change { color: #16a34a; }
+  &.down .change { color: #dc2626; }
 }
 
 .price {
   font-size: 22px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #0f172a;
 }
 
 .change {
   font-size: 12px;
   margin-top: 3px;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .target-price {
@@ -164,7 +170,7 @@
 
 .target-label {
   font-size: 10px;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -177,13 +183,13 @@
 
 .target-range {
   font-size: 11px;
-  color: #475569;
+  color: #cbd5e1;
 }
 
 .price-loading {
   width: 80px;
   height: 36px;
-  background: #334155;
+  background: #f1f5f9;
   border-radius: 6px;
   animation: pulse 1.5s infinite;
 }
@@ -201,7 +207,7 @@
 .loading-bar {
   width: 100%;
   height: 4px;
-  background: #334155;
+  background: #f1f5f9;
   border-radius: 2px;
   overflow: hidden;
   position: relative;
@@ -217,14 +223,14 @@
   }
 }
 
-.card-error { font-size: 12px; color: #ef4444; }
+.card-error { font-size: 12px; color: #dc2626; }
 
 /* ── Analyst Rating Donut ──────────────────────── */
 .rating-section {
   padding: 14px;
-  background: #0f172a;
+  background: #f8fafc;
   border-radius: 10px;
-  border: 1px solid #1e293b;
+  border: 1px solid #e2e8f0;
 }
 
 .donut-wrap {
@@ -245,9 +251,9 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #94a3b8;
+  color: #64748b;
 
-  strong { color: #f1f5f9; margin-left: auto; }
+  strong { color: #0f172a; margin-left: auto; }
 }
 
 .leg-dot {
@@ -268,8 +274,8 @@
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: #1e293b;
-  border: 12px solid #334155;
+  background: #f1f5f9;
+  border: 12px solid #e2e8f0;
   animation: pulse 1.5s infinite;
 }
 
@@ -279,9 +285,9 @@
   flex-direction: column;
   gap: 6px;
   padding: 12px 14px;
-  background: #0f172a;
+  background: #f8fafc;
   border-radius: 10px;
-  border: 1px solid #1e293b;
+  border: 1px solid #e2e8f0;
 }
 
 .range-header {
@@ -293,7 +299,7 @@
 .range-label-title {
   font-size: 10px;
   font-weight: 600;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -301,7 +307,7 @@
 .range-current {
   font-size: 13px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #0f172a;
 }
 
 .range-bar-wrap {
@@ -312,7 +318,7 @@
 
 .range-edge {
   font-size: 11px;
-  color: #64748b;
+  color: #94a3b8;
   white-space: nowrap;
   min-width: 36px;
 
@@ -322,7 +328,7 @@
 .range-track {
   flex: 1;
   height: 6px;
-  background: #334155;
+  background: #e2e8f0;
   border-radius: 3px;
   position: relative;
   overflow: visible;
@@ -339,7 +345,7 @@
 }
 
 .target-fill {
-  background: linear-gradient(to right, #1d4ed8, #3b82f6, #7dd3fc) !important;
+  background: linear-gradient(to right, #93c5fd, #3b82f6, #1d4ed8) !important;
 }
 
 .mean-marker {
@@ -356,12 +362,12 @@
   display: flex;
   justify-content: space-between;
   font-size: 10px;
-  color: #64748b;
+  color: #94a3b8;
   margin-top: 2px;
 }
 
-.legend-mean { color: #f59e0b; font-weight: 600; }
-.legend-median { color: #64748b; }
+.legend-mean { color: #d97706; font-weight: 600; }
+.legend-median { color: #94a3b8; }
 
 .price-marker {
   position: absolute;
@@ -376,8 +382,8 @@
 .marker-dot {
   width: 12px;
   height: 12px;
-  background: #f1f5f9;
-  border: 2px solid #0f172a;
+  background: #3b82f6;
+  border: 2px solid #ffffff;
   border-radius: 50%;
   box-shadow: 0 0 0 2px #3b82f6;
 }
@@ -386,7 +392,7 @@
 .metrics-strip {
   display: flex;
   gap: 0;
-  border: 1px solid #334155;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -397,14 +403,14 @@
   flex-direction: column;
   gap: 2px;
   padding: 10px 12px;
-  border-right: 1px solid #334155;
+  border-right: 1px solid #e2e8f0;
 
   &:last-child { border-right: none; }
 }
 
 .m-label {
   font-size: 9px;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -412,27 +418,27 @@
 .m-val {
   font-size: 13px;
   font-weight: 700;
-  color: #e2e8f0;
-  &.up   { color: #22c55e; }
+  color: #0f172a;
+  &.up   { color: #16a34a; }
 }
 
 .m-sub {
   font-size: 10px;
-  color: #64748b;
-  .down { color: #ef4444; }
+  color: #94a3b8;
+  .down { color: #dc2626; }
 }
 
 /* ── Drill hint ────────────────────────────────── */
 .drill-hint {
   font-size: 12px;
-  color: #475569;
+  color: #cbd5e1;
   text-align: right;
   transition: color 0.15s;
 }
 
 .card.clickable { cursor: pointer; }
 .card.clickable:hover .drill-hint { color: #3b82f6; }
-.drill-hint.guest { color: #334155; font-style: italic; }
+.drill-hint.guest { color: #e2e8f0; font-style: italic; }
 
 /* ── Animations ────────────────────────────────── */
 @keyframes shimmer { to { left: 140%; } }
