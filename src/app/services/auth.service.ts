@@ -8,7 +8,7 @@ export type Role = 'guest' | 'member' | 'admin';
 export class AuthService {
   private router = inject(Router);
   private supabaseSvc = inject(SupabaseService);
-  private client = this.supabaseSvc.client;
+  client = this.supabaseSvc.client;
 
   user = signal<any>(null);
   role = signal<Role>('guest');
@@ -50,7 +50,7 @@ export class AuthService {
   async signInWithGoogle() {
     await this.client.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.href.split('#')[0].split('?')[0] }
+      options: { redirectTo: window.location.origin }
     });
   }
 

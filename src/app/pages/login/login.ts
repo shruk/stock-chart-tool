@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -53,6 +54,14 @@ import { AuthService } from '../../services/auth.service';
     }
   `]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   auth = inject(AuthService);
+  private router = inject(Router);
+
+  ngOnInit() {
+    if (this.auth.isLoggedIn()) this.router.navigate(['/']);
+    this.auth.client.auth.onAuthStateChange((_, session) => {
+      if (session) this.router.navigate(['/']);
+    });
+  }
 }
