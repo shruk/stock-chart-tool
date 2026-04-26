@@ -38,12 +38,13 @@ export class AuthService {
     this.user.set(session.user);
 
     const { data } = await this.client
-      .from('profiles')
+      .from('user_app_roles')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('user_id', session.user.id)
+      .eq('app', 'admin')
       .single();
 
-    this.role.set((data?.role as Role) ?? 'member');
+    this.role.set((data?.role as Role) ?? 'guest');
     this.loading.set(false);
   }
 
