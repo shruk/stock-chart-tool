@@ -34,6 +34,17 @@ CREATE POLICY "public write price_bars"    ON price_bars    FOR ALL    USING (tr
 CREATE POLICY "public read analyst_cache"  ON analyst_cache FOR SELECT USING (true);
 CREATE POLICY "public write analyst_cache" ON analyst_cache FOR ALL    USING (true);
 
+-- AI-generated market summary (refreshed daily by Azure Function timer)
+CREATE TABLE IF NOT EXISTS market_summary (
+  id           BIGSERIAL    PRIMARY KEY,
+  content      TEXT         NOT NULL,
+  generated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE market_summary ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public read market_summary"  ON market_summary FOR SELECT USING (true);
+CREATE POLICY "public write market_summary" ON market_summary FOR ALL    USING (true);
+
 -- Used by the admin page to show bar counts per symbol
 CREATE OR REPLACE FUNCTION get_symbol_stats()
 RETURNS TABLE(symbol TEXT, bar_count BIGINT, from_date TEXT, to_date TEXT, has_analyst BOOLEAN)
