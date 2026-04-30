@@ -1,0 +1,55 @@
+<div class="app">
+  <header class="header">
+    <h1 class="title">Stock Chart Tool</h1>
+    @if (symbol()) {
+      <span class="symbol-badge">{{ symbol() }}</span>
+    }
+    <div class="header-actions">
+      <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
+        {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
+      </button>
+      <app-settings-panel />
+    </div>
+  </header>
+
+  <app-search-bar (search)="onSearch($event)" />
+
+  <div class="toolbar">
+    <span class="label">Indicators:</span>
+    <button class="toggle" [class.on]="showSMA20()" (click)="showSMA20.set(!showSMA20())">SMA 20</button>
+    <button class="toggle" [class.on]="showSMA50()" (click)="showSMA50.set(!showSMA50())">SMA 50</button>
+    <button class="toggle" [class.on]="showSMA100()" (click)="showSMA100.set(!showSMA100())">SMA 100</button>
+    <button class="toggle" [class.on]="showBB()" (click)="showBB.set(!showBB())">Bollinger Bands</button>
+    <button class="toggle" [class.on]="showVolume()" (click)="showVolume.set(!showVolume())">Volume</button>
+    <button class="toggle" [class.on]="showRSI()" (click)="showRSI.set(!showRSI())">RSI</button>
+    <button class="toggle" [class.on]="showMACD()" (click)="showMACD.set(!showMACD())">MACD</button>
+  </div>
+
+  @if (testMode()) {
+    <div class="test-banner">Test Mode — displaying generated fake data. No API key required.</div>
+  }
+
+  <div class="content">
+    @if (loading()) {
+      <div class="state-msg loading">Loading chart data...</div>
+    } @else if (error()) {
+      <div class="state-msg error">{{ error() }}</div>
+    } @else if (bars().length === 0) {
+      <div class="state-msg empty">
+        <p>Select a stock symbol and click Search to view the chart.</p>
+        <p class="hint">First time? Click the &#9881; Settings icon to enter your Polygon.io API key.</p>
+      </div>
+    } @else {
+      <app-stock-chart
+        [bars]="bars()"
+        [showSMA20]="showSMA20()"
+        [showSMA50]="showSMA50()"
+        [showSMA100]="showSMA100()"
+        [showBB]="showBB()"
+        [showVolume]="showVolume()"
+        [showRSI]="showRSI()"
+        [showMACD]="showMACD()"
+      />
+    }
+  </div>
+</div>
