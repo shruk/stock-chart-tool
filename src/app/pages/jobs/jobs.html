@@ -1,0 +1,67 @@
+<div class="admin">
+  <header class="admin-header">
+    <nav class="admin-nav">
+      <button class="nav-btn" (click)="navigate('/')">Dashboard</button>
+      <button class="nav-btn" (click)="navigate('/admin')">Symbols</button>
+      <button class="nav-btn active">Jobs</button>
+    </nav>
+    <button class="btn-reload" (click)="loadStatus()">↻ Reload</button>
+  </header>
+
+  <table class="stats-table">
+    <thead>
+      <tr>
+        <th>Job</th>
+        <th>Schedule (UTC)</th>
+        <th>Last Run</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (job of jobs; track job.id) {
+        <tr>
+          <td>
+            <div class="job-name">{{ job.name }}</div>
+            <div class="job-desc">{{ job.description }}</div>
+            @if (job.note) {
+              <div class="job-note">{{ job.note }}</div>
+            }
+          </td>
+          <td class="schedule-cell">{{ job.schedule }}</td>
+          <td class="last-run-cell">
+            @if (job.id === 'fetch-stock-data' && status()?.fetchStockDataRunning) {
+              <span class="running-badge">● Running</span>
+              @if (elapsedLabel(); as elapsed) {
+                <span class="elapsed">{{ elapsed }}</span>
+              }
+            } @else if (loading()) {
+              <span class="muted">—</span>
+            } @else if (lastRun(job)) {
+              {{ lastRun(job) | date:'yyyy-MM-dd HH:mm' : 'UTC' }}
+              <span class="tz">UTC</span>
+            } @else {
+              <span class="muted">Never</span>
+            }
+          </td>
+          <td class="actions-cell">
+            @let fetchBusy = job.id === 'fetch-stock-data' && status()?.fetchStockDataRunning;
+            <button
+              class="btn-run"
+              [disabled]="running().has(job.id) || fetchBusy"
+              (click)="run(job)">
+              {{ running().has(job.id) ? '…' : '▶ Run Now' }}
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="messages">
+    @for (msg of messages(); track $index) {
+      <div class="msg" [class.ok]="msg.ok" [class.err]="!msg.ok">
+        <strong>{{ msg.id }}</strong> — {{ msg.text }}
+      </div>
+    }
+  </div>
+</div>

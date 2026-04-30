@@ -27,6 +27,7 @@ export class SymbolManagerComponent implements OnInit {
   deletingData = signal<Set<string>>(new Set());
   deletingSymbol = signal<Set<string>>(new Set());
   updatingAnalyst = signal<Set<string>>(new Set());
+  updatingType = signal<Set<string>>(new Set());
   messages = signal<{ symbol: string; text: string; ok: boolean }[]>([]);
   indexStats = signal<Record<string, SymbolStat>>({});
   loadingIndex = signal<Set<string>>(new Set());
@@ -142,5 +143,20 @@ export class SymbolManagerComponent implements OnInit {
     });
   }
 
+  updateType(symbol: string, type: string) {
+    this.updatingType.update(s => new Set(s).add(symbol));
+    this.functionsSvc.updateSymbolType(symbol, type).subscribe({
+      next: () => {
+        this.stats.update(list => list.map(s => s.symbol === symbol ? { ...s, type } : s));
+        this.updatingType.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+      },
+      error: () => {
+        this.messages.update(m => [{ symbol, text: 'Type update failed', ok: false }, ...m]);
+        this.updatingType.update(s => { const n = new Set(s); n.delete(symbol); return n; });
+      }
+    });
+  }
+
   goBack() { this.router.navigate(['/']); }
+  goJobs() { this.router.navigate(['/jobs']); }
 }

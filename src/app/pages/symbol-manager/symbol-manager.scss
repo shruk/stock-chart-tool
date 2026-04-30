@@ -6,20 +6,6 @@
   font-family: 'Inter', sans-serif;
 }
 
-.admin-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
-
-  h1 {
-    margin: 0;
-    font-size: 1.4rem;
-    flex: 1;
-    color: #0f172a;
-  }
-}
-
 .back-btn, .btn-reload {
   background: #ffffff;
   color: #64748b;
@@ -88,7 +74,21 @@
   tr:hover td { background: #f8fafc; }
 }
 
-.analyst-cell, th:nth-child(5) {
+.type-select {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #475569;
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  cursor: pointer;
+  font-family: inherit;
+
+  &:hover:not(:disabled) { border-color: #94a3b8; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.analyst-cell, th:nth-child(6) {
   text-align: center;
 }
 

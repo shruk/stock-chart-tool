@@ -1,7 +1,10 @@
 <div class="admin">
   <header class="admin-header">
-    <button class="back-btn" (click)="goBack()">← Dashboard</button>
-    <h1>Symbol Manager</h1>
+    <nav class="admin-nav">
+      <button class="nav-btn" (click)="goBack()">Dashboard</button>
+      <button class="nav-btn active">Symbols</button>
+      <button class="nav-btn" (click)="goJobs()">Jobs</button>
+    </nav>
     <button class="btn-reload" (click)="loadStats()">↻ Reload</button>
   </header>
 
@@ -43,6 +46,7 @@
       <thead>
         <tr>
           <th>Symbol</th>
+          <th>Type</th>
           <th>Bars</th>
           <th>From</th>
           <th>To</th>
@@ -54,6 +58,17 @@
         @for (stat of stats(); track stat.symbol) {
           <tr>
             <td class="sym">{{ stat.symbol }}</td>
+            <td>
+              <select class="type-select"
+                [value]="stat.type"
+                [disabled]="updatingType().has(stat.symbol)"
+                (change)="updateType(stat.symbol, $any($event.target).value)">
+                <option value="stock">Stock</option>
+                <option value="etf">ETF</option>
+                <option value="index">Index</option>
+                <option value="crypto">Crypto</option>
+              </select>
+            </td>
             <td>{{ stat.barCount | number }}</td>
             <td>{{ stat.fromDate }}</td>
             <td>{{ stat.toDate }}</td>
@@ -61,7 +76,7 @@
               <span class="analyst-dot" [class.has-data]="stat.hasAnalyst">{{ stat.hasAnalyst ? '✓' : '✗' }}</span>
             </td>
             <td class="actions-cell">
-              <button class="btn-refresh" title="Fetch missing price bars since last update" (click)="refresh(stat.symbol)">↻ Refresh</button>
+              <button class="btn-refresh" title="Fetch missing price bars since last update" (click)="refresh(stat.symbol)">↻ Update</button>
               <button class="btn-analyst" title="Force refresh analyst recommendations and metrics" [disabled]="updatingAnalyst().has(stat.symbol)" (click)="updateAnalyst(stat.symbol)">
                 {{ updatingAnalyst().has(stat.symbol) ? '…' : '⟳ Analyst' }}
               </button>

@@ -4,10 +4,9 @@ import { Router } from '@angular/router';
 import { Bar } from '../../services/polygon';
 import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
-import { FunctionsService } from '../../services/functions.service';
+import { FunctionsService, RiskData } from '../../services/functions.service';
 import { MockDataService } from '../../services/mock-data';
 import { AuthService } from '../../services/auth.service';
-import { SparklineComponent } from '../../components/sparkline/sparkline';
 
 interface StockCard {
   symbol: string;
@@ -15,18 +14,19 @@ interface StockCard {
   price: number | null;
   change: number | null;
   changePct: number | null;
-  sparkline: number[];
   loading: boolean;
   error: string;
   analyst: AnalystData | null;
   analystLoading: boolean;
+  risk: RiskData | null;
+  riskLoading: boolean;
 }
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [SparklineComponent, DecimalPipe],
+  imports: [DecimalPipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -67,8 +67,9 @@ export class DashboardComponent implements OnInit {
         const symbols = this.auth.isMember() ? all : all.filter(s => this.GUEST_SYMBOLS.includes(s));
         this.stocks.set(symbols.map(symbol => ({
           symbol, name: symbol,
-          price: null, change: null, changePct: null, sparkline: [],
-          loading: true, error: '', analyst: null, analystLoading: true
+          price: null, change: null, changePct: null,
+          loading: true, error: '', analyst: null, analystLoading: true,
+          risk: null, riskLoading: true
         })));
         this.loadingSymbols.set(false);
         symbols.forEach(symbol => this.loadStock(symbol));
@@ -100,13 +101,33 @@ export class DashboardComponent implements OnInit {
         } : s
       ));
     });
+
+    this.functionsSvc.getSymbolRisk(symbol).subscribe({
+      next: risk => this.stocks.update(list => list.map(s =>
+        s.symbol === symbol ? { ...s, risk: risk?.twoWeek ? risk : null, riskLoading: false } : s
+      )),
+      error: () => this.stocks.update(list => list.map(s =>
+        s.symbol === symbol ? { ...s, riskLoading: false } : s
+      )),
+    });
   }
 
   private loadMockData() {
     this.stocks.update(list => list.map(s => {
       const bars = this.mockDataSvc.generate('3M');
       const summary = this.summarize(bars);
-      return { ...s, ...summary, loading: false, analyst: this.mockDataSvc.generateAnalyst(summary.price ?? 150), analystLoading: false };
+      return {
+        ...s, ...summary, loading: false,
+        analyst: this.mockDataSvc.generateAnalyst(summary.price ?? 150), analystLoading: false,
+        risk: {
+          twoWeek:    { lossProbability: 0.12, var95: -0.08 },
+          oneMonth:   { lossProbability: 0.19, var95: -0.13 },
+          threeMonth: { lossProbability: 0.28, var95: -0.20 },
+          sixMonth:   { lossProbability: 0.37, var95: -0.27 },
+          calculatedAt: new Date().toISOString(),
+        },
+        riskLoading: false,
+      };
     }));
   }
 
@@ -209,16 +230,27 @@ export class DashboardComponent implements OnInit {
     return d.toISOString().split('T')[0];
   }
 
-  private summarize(bars: Bar[]): Pick<StockCard, 'price' | 'change' | 'changePct' | 'sparkline'> {
-    if (bars.length < 2) return { price: null, change: null, changePct: null, sparkline: [] };
+  riskHorizons(card: StockCard): { label: string; lossPct: number; var95abs: number }[] {
+    const r = card.risk;
+    if (!r) return [];
+    return [
+      { label: '2W',  lossPct: r.twoWeek.lossProbability,    var95abs: Math.abs(r.twoWeek.var95) },
+      { label: '1M',  lossPct: r.oneMonth.lossProbability,   var95abs: Math.abs(r.oneMonth.var95) },
+      { label: '3M',  lossPct: r.threeMonth.lossProbability, var95abs: Math.abs(r.threeMonth.var95) },
+      { label: '6M',  lossPct: r.sixMonth.lossProbability,   var95abs: Math.abs(r.sixMonth.var95) },
+    ];
+  }
+
+  private summarize(bars: Bar[]): Pick<StockCard, 'price' | 'change' | 'changePct'> {
+    if (bars.length < 2) return { price: null, change: null, changePct: null };
     const last = bars[bars.length - 1];
     const prev = bars[bars.length - 2];
     const change = last.close - prev.close;
-    const sparkline = bars.slice(-30).map(b => b.close);
-    return { price: last.close, change, changePct: (change / prev.close) * 100, sparkline };
+    return { price: last.close, change, changePct: (change / prev.close) * 100 };
   }
 
   openStock(symbol: string) { this.router.navigate(['/stock', symbol]); }
   openAdmin() { this.router.navigate(['/admin']); }
+  openJobs()  { this.router.navigate(['/jobs']); }
   openLogin() { this.router.navigate(['/login']); }
 }

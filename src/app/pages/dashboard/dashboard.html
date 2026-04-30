@@ -1,14 +1,17 @@
 <div class="app">
-  <header class="header">
-    <h1 class="title">Admin Dashboard</h1>
+  <header class="admin-header">
+    <nav class="admin-nav">
+      <button class="nav-btn active">Dashboard</button>
+      @if (auth.isAdmin()) {
+        <button class="nav-btn" (click)="openAdmin()">Symbols</button>
+        <button class="nav-btn" (click)="openJobs()">Jobs</button>
+      }
+    </nav>
     <div class="header-actions">
       @if (auth.isAdmin()) {
         <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
           {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
         </button>
-      }
-      @if (auth.isAdmin()) {
-        <button class="admin-btn" (click)="openAdmin()">&#9881; Symbols</button>
         <div class="user-info">
           <span class="user-email">{{ auth.user()?.email }}</span>
           <button class="signout-btn" (click)="auth.signOut()">Sign out</button>
@@ -63,16 +66,31 @@
           }
         </div>
 
-        <!-- Sparkline -->
-        <div class="sparkline-wrap">
-          @if (stock.loading) {
-            <div class="loading-bar"></div>
-          } @else if (stock.error) {
-            <div class="card-error">{{ stock.error }}</div>
-          } @else if (stock.sparkline.length > 1) {
-            <app-sparkline [data]="stock.sparkline" />
-          }
-        </div>
+        <!-- Risk chart -->
+        @if (stock.riskLoading) {
+          <div class="risk-skeleton"></div>
+        } @else if (stock.risk) {
+          <div class="risk-section">
+            <div class="risk-title">Loss Probability · Monte Carlo</div>
+            @for (h of riskHorizons(stock); track h.label) {
+              <div class="risk-row">
+                <span class="risk-label">{{ h.label }}</span>
+                <div class="risk-track">
+                  <div class="risk-bar"
+                    [style.width.%]="h.lossPct * 100"
+                    [class.risk-low]="h.lossPct < 0.2"
+                    [class.risk-mid]="h.lossPct >= 0.2 && h.lossPct < 0.35"
+                    [class.risk-high]="h.lossPct >= 0.35">
+                  </div>
+                </div>
+                <span class="risk-val">{{ (h.lossPct * 100) | number:'1.0-0' }}%</span>
+                <span class="risk-var">-{{ (h.var95abs * 100) | number:'1.1-1' }}%</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="risk-no-data">No risk data — run calculation in Jobs</div>
+        }
 
         <!-- Analyst rating section -->
         @if (stock.analystLoading) {
