@@ -10,6 +10,7 @@ export interface SymbolStat {
   toDate: string;
   hasAnalyst: boolean;
   type: string;
+  analystCachedAt?: string;
 }
 
 @Injectable({ providedIn: 'root' })

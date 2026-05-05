@@ -157,6 +157,16 @@ export class SymbolManagerComponent implements OnInit {
     });
   }
 
+  analystAge(cachedAt?: string): string {
+    if (!cachedAt) return '—';
+    const diffMs = Date.now() - new Date(cachedAt).getTime();
+    const h = Math.floor(diffMs / 3_600_000);
+    if (h < 1)  return 'just now';
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    return `${d}d ago`;
+  }
+
   goBack() { this.router.navigate(['/']); }
   goJobs() { this.router.navigate(['/jobs']); }
 }

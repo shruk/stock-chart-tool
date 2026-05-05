@@ -74,6 +74,7 @@
             <td>{{ stat.toDate }}</td>
             <td class="analyst-cell">
               <span class="analyst-dot" [class.has-data]="stat.hasAnalyst">{{ stat.hasAnalyst ? '✓' : '✗' }}</span>
+              <span class="analyst-age">{{ analystAge(stat.analystCachedAt) }}</span>
             </td>
             <td class="actions-cell">
               <button class="btn-refresh" title="Fetch missing price bars since last update" (click)="refresh(stat.symbol)">↻ Update</button>
