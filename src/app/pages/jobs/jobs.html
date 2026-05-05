@@ -12,7 +12,8 @@
     <thead>
       <tr>
         <th>Job</th>
-        <th>Schedule (UTC)</th>
+        <th>Schedule</th>
+        <th>Status</th>
         <th>Last Run</th>
         <th></th>
       </tr>
@@ -27,7 +28,24 @@
               <div class="job-note">{{ job.note }}</div>
             }
           </td>
-          <td class="schedule-cell">{{ job.schedule }}</td>
+          <td class="schedule-cell">
+            @if (scheduleInfo(job); as info) {
+              <div>{{ info.label }}</div>
+              <div class="cron-expr">{{ info.cron }}</div>
+            } @else {
+              {{ job.schedule }}
+            }
+          </td>
+          <td class="schedule-status-cell">
+            @if (scheduleInfo(job); as info) {
+              <span class="schedule-badge" [class.active]="info.active" [class.inactive]="!info.active">
+                {{ info.active ? '● Active' : '● Inactive' }}
+              </span>
+              @if (info.note) {
+                <div class="schedule-note">{{ info.note }}</div>
+              }
+            }
+          </td>
           <td class="last-run-cell">
             @if (job.id === 'fetch-stock-data' && status()?.fetchStockDataRunning) {
               <span class="running-badge">● Running</span>

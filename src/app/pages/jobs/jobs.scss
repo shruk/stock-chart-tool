@@ -67,6 +67,31 @@
   color: #475569;
   font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
+
+  .cron-expr {
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-family: monospace;
+    margin-top: 2px;
+  }
+}
+
+.schedule-status-cell { white-space: nowrap; }
+
+.schedule-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  &.active   { color: #16a34a; }
+  &.inactive { color: #dc2626; }
+}
+
+.schedule-note {
+  color: #94a3b8;
+  font-size: 0.72rem;
+  margin-top: 3px;
+  font-style: italic;
+  white-space: normal;
+  max-width: 160px;
 }
 
 .last-run-cell {

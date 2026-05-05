@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { FunctionsService, JobStatus } from '../../services/functions.service';
+import { FunctionsService, JobStatus, ScheduleInfo } from '../../services/functions.service';
 
 interface Job {
   id: string;
@@ -106,6 +106,17 @@ export class JobsComponent implements OnInit, OnDestroy {
 
   lastRun(job: Job): string | null {
     return this.status()?.[job.lastRunKey] ?? null;
+  }
+
+  scheduleInfo(job: Job): ScheduleInfo | null {
+    const s = this.status()?.schedules;
+    if (!s) return null;
+    const map: Record<string, ScheduleInfo> = {
+      'fetch-stock-data': s.fetchStockData,
+      'market-summary':   s.marketSummary,
+      'calculate-risks':  s.calculateRisks,
+    };
+    return map[job.id] ?? null;
   }
 
   navigate(path: string) { this.router.navigate([path]); }

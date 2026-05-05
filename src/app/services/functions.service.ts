@@ -68,10 +68,22 @@ export interface RiskData {
   calculatedAt: string;
 }
 
+export interface ScheduleInfo {
+  cron: string;
+  label: string;
+  active: boolean;
+  note?: string | null;
+}
+
 export interface JobStatus {
   fetchStockData: string | null;
   marketSummary: string | null;
   calculateRisks: string | null;
   fetchStockDataRunning: boolean;
   fetchStockDataStartedAt: string | null;
+  schedules?: {
+    fetchStockData: ScheduleInfo;
+    marketSummary: ScheduleInfo;
+    calculateRisks: ScheduleInfo;
+  };
 }
