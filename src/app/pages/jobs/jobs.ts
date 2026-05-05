@@ -119,5 +119,19 @@ export class JobsComponent implements OnInit, OnDestroy {
     return map[job.id] ?? null;
   }
 
+  localLabel(info: ScheduleInfo): string {
+    // Parse "HH:MM PM UTC" from the label and convert to local time
+    const match = info.label.match(/(\d+):(\d+)\s*(AM|PM)\s*UTC/i);
+    if (!match) return info.label;
+    let h = parseInt(match[1]);
+    const m = parseInt(match[2]);
+    const ampm = match[3].toUpperCase();
+    if (ampm === 'PM' && h !== 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    const d = new Date();
+    d.setUTCHours(h, m, 0, 0);
+    return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
   navigate(path: string) { this.router.navigate([path]); }
 }

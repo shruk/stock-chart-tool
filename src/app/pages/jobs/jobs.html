@@ -30,7 +30,7 @@
           </td>
           <td class="schedule-cell">
             @if (scheduleInfo(job); as info) {
-              <div>{{ info.label }}</div>
+              <div>{{ localLabel(info) }}</div>
               <div class="cron-expr">{{ info.cron }}</div>
             } @else {
               {{ job.schedule }}
@@ -55,8 +55,8 @@
             } @else if (loading()) {
               <span class="muted">—</span>
             } @else if (lastRun(job)) {
-              {{ lastRun(job) | date:'yyyy-MM-dd HH:mm' : 'UTC' }}
-              <span class="tz">UTC</span>
+              {{ lastRun(job) | date:'yyyy-MM-dd HH:mm' }}
+              <span class="tz">local</span>
             } @else {
               <span class="muted">Never</span>
             }
