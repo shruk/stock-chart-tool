@@ -71,6 +71,19 @@ export class StockDetailComponent implements OnInit {
     }
     this.loading.set(true);
     this.error.set('');
+
+    if (timeframe === '1D') {
+      this.functionsSvc.getIntradayBars(sym).subscribe({
+        next: bars => {
+          if (bars?.length) this.bars.set(bars);
+          else this.error.set('No intraday data available');
+          this.loading.set(false);
+        },
+        error: () => { this.error.set('Failed to load intraday data'); this.loading.set(false); }
+      });
+      return;
+    }
+
     const bars = await this.supabaseSvc.getPriceBars(sym, this.getFromDate(timeframe));
     if (bars?.length) {
       this.bars.set(bars);

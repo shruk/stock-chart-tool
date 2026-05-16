@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Bar } from './polygon';
 
 export interface SymbolStat {
   symbol: string;
@@ -56,6 +57,10 @@ export class FunctionsService {
 
   getSymbolQa(symbol: string): Observable<SymbolQa> {
     return this.http.get<SymbolQa>(`${this.base}/qa/${symbol}`);
+  }
+
+  getIntradayBars(symbol: string): Observable<Bar[]> {
+    return this.http.get<Bar[]>(`${this.base}/intraday/${symbol}`);
   }
 
   getLogs(type: LogType, hours = 48): Observable<LogEntry[]> {
