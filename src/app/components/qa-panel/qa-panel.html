@@ -8,14 +8,6 @@
 
     <div class="qa-header">AI Insights</div>
 
-    <!-- Q1 — Company Overview -->
-    @if (data()!.companyOverview) {
-      <div class="qa-card">
-        <div class="qa-card-title">Company Overview &amp; Market Conditions</div>
-        <p class="qa-text">{{ data()!.companyOverview }}</p>
-      </div>
-    }
-
     <!-- Q2 — Earnings -->
     @if (data()!.earnings?.quarters?.length) {
       <div class="qa-card">
@@ -110,6 +102,14 @@
         @if (data()!.peers!.commentary) {
           <p class="qa-text commentary">{{ data()!.peers!.commentary }}</p>
         }
+      </div>
+    }
+
+    <!-- Q1 — Company Overview -->
+    @if (data()!.companyOverview) {
+      <div class="qa-card">
+        <div class="qa-card-title">Company Overview &amp; Market Conditions</div>
+        <p class="qa-text">{{ data()!.companyOverview }}</p>
       </div>
     }
 
