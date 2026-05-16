@@ -53,6 +53,24 @@ export class FunctionsService {
   updateSymbolType(symbol: string, type: string): Observable<{ symbol: string; type: string }> {
     return this.http.patch<any>(`${this.base}/symbols/${symbol}/type`, { type });
   }
+
+  getSymbolQa(symbol: string): Observable<SymbolQa> {
+    return this.http.get<SymbolQa>(`${this.base}/qa/${symbol}`);
+  }
+
+  getLogs(type: LogType, hours = 48): Observable<LogEntry[]> {
+    return this.http.get<LogEntry[]>(`${this.base}/logs?type=${type}&hours=${hours}`);
+  }
+}
+
+export type LogType = 'jobs' | 'admin' | 'ui';
+
+export interface LogEntry {
+  timestamp: string;
+  level: string;
+  message: string;
+  operation: string;
+  category: string;
 }
 
 export interface RiskHorizon {
@@ -68,6 +86,60 @@ export interface RiskData {
   calculatedAt: string;
 }
 
+export interface EarningsQuarter {
+  period: string;
+  fiscalDate: string;
+  revenue?: number;
+  revenueGrowthYoy?: number;
+  netIncome?: number;
+  eps?: number;
+  epsEstimate?: number;
+  epsSurprise?: number;
+}
+
+export interface PeerCompany {
+  peerSymbol: string;
+  isSelf: boolean;
+  companyName?: string;
+  stockPrice?: number;
+  priceChange52w?: number;
+  marketCap?: number;
+  peRatio?: number;
+  psRatio?: number;
+  pbRatio?: number;
+  evEbitda?: number;
+  dividendYield?: number;
+}
+
+export interface SentimentQa {
+  sentimentScore: number;
+  analystScore?: number;
+  shortFloatPct?: number;
+  daysToCover?: number;
+  insiderBuys90d: number;
+  insiderSells90d: number;
+  insiderNetValue90d: number;
+  institutionalOwnershipPct?: number;
+  topInstitutionName?: string;
+  commentary?: string;
+}
+
+export interface SymbolQa {
+  symbol: string;
+  companyOverview?: string;
+  earnings?: {
+    quarters: EarningsQuarter[];
+    commentary?: string;
+  };
+  peers?: {
+    companies: PeerCompany[];
+    selectedMetrics: string[];
+    commentary?: string;
+  };
+  management?: string;
+  sentiment?: SentimentQa;
+}
+
 export interface ScheduleInfo {
   cron: string;
   label: string;
@@ -79,11 +151,13 @@ export interface JobStatus {
   fetchStockData: string | null;
   marketSummary: string | null;
   calculateRisks: string | null;
+  qaRefresh: string | null;
   fetchStockDataRunning: boolean;
   fetchStockDataStartedAt: string | null;
   schedules?: {
     fetchStockData: ScheduleInfo;
     marketSummary: ScheduleInfo;
     calculateRisks: ScheduleInfo;
+    qaRefresh: ScheduleInfo;
   };
 }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, AfterViewInit, input, effect, ElementRef, viewChild, inject } from '@angular/core';
+import { Component, OnDestroy, input, effect, ElementRef, viewChild, inject } from '@angular/core';
 import { createChart, IChartApi, CandlestickSeries, LineSeries, HistogramSeries, LineStyle, UTCTimestamp } from 'lightweight-charts';
 import type { ISeriesApi, SeriesType } from 'lightweight-charts';
 import { PolygonService, Bar } from '../../services/polygon';
@@ -21,7 +21,7 @@ const CHART_THEME = {
   templateUrl: './stock-chart.html',
   styleUrl: './stock-chart.scss'
 })
-export class StockChartComponent implements AfterViewInit, OnDestroy {
+export class StockChartComponent implements OnDestroy {
   readonly bars = input<Bar[]>([]);
   readonly showSMA20 = input(true);
   readonly showSMA50 = input(true);
@@ -45,25 +45,24 @@ export class StockChartComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     effect(() => {
+      const mainEl = this.mainChartRef()?.nativeElement;
+      const rsiEl  = this.rsiChartRef()?.nativeElement;
+      const macdEl = this.macdChartRef()?.nativeElement;
       const bars = this.bars();
       void this.showSMA20(); void this.showSMA50(); void this.showSMA100();
       void this.showBB(); void this.showVolume();
       void this.showRSI(); void this.showMACD();
+
+      if (!mainEl || !rsiEl || !macdEl) return;
+
+      if (!this.main) {
+        this.main = createChart(mainEl, CHART_THEME);
+        this.rsi  = createChart(rsiEl,  { ...CHART_THEME, timeScale: { ...CHART_THEME.timeScale, visible: false } });
+        this.macd = createChart(macdEl, { ...CHART_THEME, timeScale: { ...CHART_THEME.timeScale, visible: false } });
+      }
+
       if (bars.length > 0) this.renderAll(bars);
     });
-  }
-
-  ngAfterViewInit() {
-    const mainEl = this.mainChartRef()?.nativeElement;
-    const rsiEl = this.rsiChartRef()?.nativeElement;
-    const macdEl = this.macdChartRef()?.nativeElement;
-    if (!mainEl || !rsiEl || !macdEl) return;
-
-    this.main = createChart(mainEl, CHART_THEME);
-    this.rsi = createChart(rsiEl, { ...CHART_THEME, timeScale: { ...CHART_THEME.timeScale, visible: false } });
-    this.macd = createChart(macdEl, { ...CHART_THEME, timeScale: { ...CHART_THEME.timeScale, visible: false } });
-
-    if (this.bars().length > 0) this.renderAll(this.bars());
   }
 
   private clearMain() {
@@ -95,10 +94,13 @@ export class StockChartComponent implements AfterViewInit, OnDestroy {
     this.mainSeries.push(cs);
 
     if (this.showVolume()) {
-      const vs = this.main!.addSeries(HistogramSeries, { priceFormat: { type: 'volume' }, priceScaleId: 'vol' });
-      vs.priceScale().applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
-      vs.setData(bars.map(b => ({ time: t(b.time), value: b.volume, color: b.close >= b.open ? '#22c55e22' : '#ef444422' })));
-      this.mainSeries.push(vs);
+      const volBars = bars.filter(b => b.volume != null && b.volume > 0);
+      if (volBars.length > 0) {
+        const vs = this.main!.addSeries(HistogramSeries, { priceFormat: { type: 'volume' }, priceScaleId: 'vol' });
+        vs.priceScale().applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+        vs.setData(volBars.map(b => ({ time: t(b.time), value: b.volume, color: b.close >= b.open ? '#22c55e22' : '#ef444422' })));
+        this.mainSeries.push(vs);
+      }
     }
 
     if (this.showSMA20()) {

@@ -1,0 +1,193 @@
+<div class="qa-panel">
+
+  @if (loading()) {
+    <div class="qa-loading">Loading AI insights...</div>
+  } @else if (!data()) {
+    <!-- nothing — silently empty before first run -->
+  } @else {
+
+    <div class="qa-header">AI Insights</div>
+
+    <!-- Q1 — Company Overview -->
+    @if (data()!.companyOverview) {
+      <div class="qa-card">
+        <div class="qa-card-title">Company Overview &amp; Market Conditions</div>
+        <p class="qa-text">{{ data()!.companyOverview }}</p>
+      </div>
+    }
+
+    <!-- Q2 — Earnings -->
+    @if (data()!.earnings?.quarters?.length) {
+      <div class="qa-card">
+        <div class="qa-card-title">Recent Financial Earnings</div>
+
+        <!-- Revenue + Net Income bars -->
+        <div class="bar-chart">
+          @for (q of data()!.earnings!.quarters; track q.fiscalDate) {
+            <div class="bar-group">
+              <div class="bars">
+                <div class="bar rev"   [style.height.%]="revenueBarHeight(q)"    title="Revenue {{ formatRevenue(q.revenue) }}"></div>
+                <div class="bar ni"
+                     [class.negative]="(q.netIncome ?? 0) < 0"
+                     [style.height.%]="netIncomeBarHeight(q)"
+                     title="Net Income {{ formatNetIncome(q.netIncome) }}"></div>
+              </div>
+              <div class="bar-label">{{ q.period }}</div>
+            </div>
+          }
+        </div>
+        <div class="bar-legend">
+          <span class="leg rev-leg">&#9646; Revenue</span>
+          <span class="leg ni-leg">&#9646; Net Income</span>
+        </div>
+
+        <!-- EPS table -->
+        @if (data()!.earnings!.quarters.some(q => q.eps != null)) {
+          <table class="eps-table">
+            <thead>
+              <tr><th>Period</th><th>Revenue</th><th>Net Income</th><th>EPS</th><th>Estimate</th><th>Beat/Miss</th></tr>
+            </thead>
+            <tbody>
+              @for (q of data()!.earnings!.quarters; track q.fiscalDate) {
+                <tr>
+                  <td>{{ q.period }}</td>
+                  <td>{{ formatRevenue(q.revenue) }}</td>
+                  <td [class.neg]="(q.netIncome ?? 0) < 0">{{ formatNetIncome(q.netIncome) }}</td>
+                  <td>{{ q.eps != null ? '$' + (q.eps | number:'1.2-2') : '—' }}</td>
+                  <td>{{ q.epsEstimate != null ? '$' + (q.epsEstimate | number:'1.2-2') : '—' }}</td>
+                  <td [class.beat]="(q.epsSurprise ?? 0) > 0" [class.miss]="(q.epsSurprise ?? 0) < 0">
+                    @if (q.epsSurprise != null) {
+                      {{ (q.epsSurprise > 0 ? '▲' : '▼') + ' $' + (q.epsSurprise | number:'1.2-2') }}
+                    } @else { — }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+
+        @if (data()!.earnings!.commentary) {
+          <p class="qa-text commentary">{{ data()!.earnings!.commentary }}</p>
+        }
+      </div>
+    }
+
+    <!-- Q3 — Peer Comparison -->
+    @if (data()!.peers?.companies?.length) {
+      <div class="qa-card">
+        <div class="qa-card-title">Peer Valuation Comparison</div>
+        <div class="peer-table-wrap">
+          <table class="peer-table">
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Company</th>
+                <th>Price</th>
+                <th>Mkt Cap</th>
+                @for (m of data()!.peers!.selectedMetrics; track m) {
+                  <th>{{ metricLabel(m) }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of data()!.peers!.companies; track p.peerSymbol) {
+                <tr [class.self-row]="p.isSelf">
+                  <td class="ticker-cell">
+                    {{ p.peerSymbol }}
+                    @if (p.isSelf) { <span class="self-badge">YOU</span> }
+                  </td>
+                  <td class="name-cell">{{ p.companyName ?? '—' }}</td>
+                  <td>{{ p.stockPrice != null ? '$' + (p.stockPrice | number:'1.2-2') : '—' }}</td>
+                  <td>{{ formatMktCap(p.marketCap) }}</td>
+                  @for (m of data()!.peers!.selectedMetrics; track m) {
+                    <td>{{ metricValue(p, m) }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (data()!.peers!.commentary) {
+          <p class="qa-text commentary">{{ data()!.peers!.commentary }}</p>
+        }
+      </div>
+    }
+
+    <!-- Q4 — Management -->
+    @if (data()!.management) {
+      <div class="qa-card">
+        <div class="qa-card-title">Management &amp; Upcoming Guidance</div>
+        <p class="qa-text">{{ data()!.management }}</p>
+      </div>
+    }
+
+    <!-- Q5 — Sentiment -->
+    @if (data()!.sentiment) {
+      <div class="qa-card">
+        <div class="qa-card-title">Retail &amp; Institutional Sentiment</div>
+
+        <div class="sentiment-top">
+          <!-- Arc gauge -->
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 200 108" width="200" height="108">
+              <!-- Background track -->
+              <circle cx="100" cy="100" r="80" fill="none"
+                stroke="#1e293b" stroke-width="16"
+                stroke-dasharray="251.33 251.33"
+                transform="rotate(-180 100 100)"/>
+              <!-- Zone fill -->
+              <circle cx="100" cy="100" r="80" fill="none"
+                [attr.stroke]="gaugeColor(data()!.sentiment!.sentimentScore)"
+                stroke-width="14" stroke-linecap="round"
+                [attr.stroke-dasharray]="gaugeFillLen(data()!.sentiment!.sentimentScore) + ' 502.65'"
+                transform="rotate(-180 100 100)"/>
+              <!-- Score text -->
+              <text x="100" y="88" text-anchor="middle" font-size="28" font-weight="700" fill="#f1f5f9">
+                {{ data()!.sentiment!.sentimentScore }}
+              </text>
+              <text x="100" y="104" text-anchor="middle" font-size="11" fill="#64748b">
+                {{ gaugeLabel(data()!.sentiment!.sentimentScore) }}
+              </text>
+            </svg>
+          </div>
+
+          <!-- Signal cards -->
+          <div class="signal-cards">
+            @let st = signalStatus(data()!.sentiment!);
+            <div class="signal-card" [class]="st.analyst">
+              <div class="sig-label">Analyst Consensus</div>
+              <div class="sig-value">{{ data()!.sentiment!.analystScore != null ? (data()!.sentiment!.analystScore | number:'1.1-1') + '/5' : '—' }}</div>
+            </div>
+            <div class="signal-card" [class]="st.short">
+              <div class="sig-label">Short Interest</div>
+              <div class="sig-value">
+                {{ data()!.sentiment!.shortFloatPct != null ? ((data()!.sentiment!.shortFloatPct! * 100) | number:'1.1-1') + '% float' : '—' }}
+              </div>
+            </div>
+            <div class="signal-card" [class]="st.insider">
+              <div class="sig-label">Insider Activity (90d)</div>
+              <div class="sig-value">
+                {{ data()!.sentiment!.insiderBuys90d }}B / {{ data()!.sentiment!.insiderSells90d }}S
+                &nbsp;<span class="net-value">{{ formatInsiderNet(data()!.sentiment!.insiderNetValue90d) }}</span>
+              </div>
+            </div>
+            <div class="signal-card" [class]="st.inst">
+              <div class="sig-label">Institutional Ownership</div>
+              <div class="sig-value">
+                {{ data()!.sentiment!.institutionalOwnershipPct != null ? ((data()!.sentiment!.institutionalOwnershipPct! * 100) | number:'1.0-0') + '%' : '—' }}
+                @if (data()!.sentiment!.topInstitutionName) {
+                  <div class="sig-sub">Top: {{ data()!.sentiment!.topInstitutionName }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @if (data()!.sentiment!.commentary) {
+          <p class="qa-text commentary">{{ data()!.sentiment!.commentary }}</p>
+        }
+      </div>
+    }
+
+  }
+</div>

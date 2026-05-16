@@ -1,42 +1,42 @@
 <div class="analyst-panel">
 
   @if (loading()) {
-    <div class="loading">Loading analyst data...</div>
-  } @else if (!data()) {
+    <div class="loading">Loading...</div>
+  } @else if (!data() && !riskData()) {
     <div class="no-data">Enter a Finnhub API key in ⚙ Settings to see analyst data.</div>
   } @else {
 
-    <!-- Company Profile -->
-    @if (profile()) {
-      <div class="profile-section">
-        @if (profile()!.logo) {
-          <img class="logo" [src]="profile()!.logo" [alt]="profile()!.name" />
-        }
-        <div class="profile-info">
-          <div class="company-name">{{ profile()!.name }}</div>
-          <div class="profile-meta">
-            <span>{{ profile()!.exchange }}</span>
-            @if (profile()!.industry) { <span>· {{ profile()!.industry }}</span> }
-            @if (profile()!.country) { <span>· {{ profile()!.country }}</span> }
-            @if (profile()!.ipo) { <span>· IPO {{ profile()!.ipo }}</span> }
+    <div class="info-card">
+
+      <!-- Company profile -->
+      @if (profile()) {
+        <div class="card-profile">
+          @if (profile()!.logo) {
+            <img class="logo" [src]="profile()!.logo" [alt]="profile()!.name" />
+          }
+          <div class="profile-info">
+            <div class="company-name">{{ profile()!.name }}</div>
+            <div class="profile-meta">
+              <span>{{ profile()!.exchange }}</span>
+              @if (profile()!.industry) { <span>· {{ profile()!.industry }}</span> }
+              @if (profile()!.country) { <span>· {{ profile()!.country }}</span> }
+              @if (profile()!.ipo) { <span>· IPO {{ profile()!.ipo }}</span> }
+            </div>
           </div>
         </div>
-      </div>
-    }
+      }
 
-    <div class="sections-row">
-
-      <!-- Analyst Ratings donut -->
+      <!-- Analyst ratings -->
       @if (rec()) {
-        <div class="section">
-          <div class="section-title">
+        <div class="card-section">
+          <div class="section-label">
             Analyst Ratings
             @if (consensusLabel()) {
               <span class="consensus-badge" [class]="consensusLabel()!.cls">{{ consensusLabel()!.text }}</span>
             }
           </div>
           <div class="donut-wrap">
-            <svg viewBox="0 0 96 96" width="96" height="96">
+            <svg viewBox="0 0 96 96" width="80" height="80">
               <circle cx="48" cy="48" r="36" fill="none" stroke="#0f172a" stroke-width="12"/>
               <g transform="rotate(-90 48 48)">
                 @for (seg of donutSegments(); track $index) {
@@ -49,7 +49,7 @@
               @if (consensusLabel()) {
                 <text x="48" y="44" text-anchor="middle" font-size="9" font-weight="700" fill="#f1f5f9">{{ consensusLabel()!.text }}</text>
               }
-              <text x="48" y="57" text-anchor="middle" font-size="8" fill="#64748b">{{ totalRatings() }} analysts</text>
+              <text x="48" y="57" text-anchor="middle" font-size="8" fill="#64748b">{{ totalRatings() }}</text>
             </svg>
             <div class="donut-legend">
               <div class="legend-item"><span class="leg-dot" style="background:#4ade80"></span><span>Strong Buy <strong>{{ rec()!.strongBuy }}</strong></span></div>
@@ -63,13 +63,13 @@
         </div>
       }
 
-      <!-- 52W Range bar -->
+      <!-- 52-week range -->
       @if (metrics()?.week52High) {
-        <div class="section">
-          <div class="section-title">52-Week Range</div>
-          <div class="range-header">
+        <div class="card-section">
+          <div class="section-label">
+            52-Week Range
             @if (currentPrice()) {
-              <span class="range-current">${{ currentPrice() | number:'1.2-2' }}</span>
+              <span class="price-tag">${{ currentPrice() | number:'1.2-2' }}</span>
             }
           </div>
           <div class="range-bar-wrap">
@@ -87,15 +87,10 @@
         </div>
       }
 
-      <!-- Analyst Price Target bar -->
+      <!-- Price target -->
       @if (target()?.targetMean) {
-        <div class="section">
-          <div class="section-title">Analyst Price Target</div>
-          <div class="range-header">
-            @if (currentPrice()) {
-              <span class="range-current">${{ currentPrice() | number:'1.2-2' }}</span>
-            }
-          </div>
+        <div class="card-section">
+          <div class="section-label">Analyst Price Target</div>
           <div class="range-bar-wrap">
             <span class="range-edge">${{ target()!.targetLow | number:'1.0-0' }}</span>
             <div class="range-track">
@@ -119,10 +114,10 @@
         </div>
       }
 
-      <!-- Key Metrics -->
+      <!-- Key metrics -->
       @if (metrics()) {
-        <div class="section">
-          <div class="section-title">Key Metrics</div>
+        <div class="card-section">
+          <div class="section-label">Key Metrics</div>
           <div class="metrics-grid">
             <div class="metric">
               <span class="m-label">Market Cap</span>
@@ -159,6 +154,33 @@
               <span class="m-val">{{ metrics()!.currentRatio ? (metrics()!.currentRatio | number:'1.2-2') : '—' }}</span>
             </div>
           </div>
+        </div>
+      }
+
+      <!-- Risk analysis -->
+      @if (riskData()) {
+        <div class="card-section">
+          <div class="section-label">Risk Analysis</div>
+          <table class="risk-table">
+            <thead>
+              <tr>
+                <th>Horizon</th>
+                <th>Loss Prob.</th>
+                <th>VaR 95%</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of riskRows(); track row.label) {
+                <tr>
+                  <td class="horizon-cell">{{ row.label }}</td>
+                  <td [class]="riskClass(row.h.lossProbability)">
+                    {{ (row.h.lossProbability * 100) | number:'1.0-0' }}%
+                  </td>
+                  <td class="var-cell">{{ (row.h.var95 * 100) | number:'1.1-1' }}%</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
       }
 

@@ -7,5 +7,7 @@ export const routes: Routes = [
   { path: 'stock/:symbol', canActivate: [adminGuard], loadComponent: () => import('./pages/stock-detail/stock-detail').then(m => m.StockDetailComponent) },
   { path: 'admin', canActivate: [adminGuard], loadComponent: () => import('./pages/symbol-manager/symbol-manager').then(m => m.SymbolManagerComponent) },
   { path: 'jobs',  canActivate: [adminGuard], loadComponent: () => import('./pages/jobs/jobs').then(m => m.JobsComponent) },
+  { path: 'docs',  canActivate: [adminGuard], loadComponent: () => import('./pages/docs/docs').then(m => m.DocsComponent) },
+  { path: 'logs',  canActivate: [adminGuard], loadComponent: () => import('./pages/logs/logs').then(m => m.LogsComponent) },
   { path: '**', redirectTo: '' }
 ];

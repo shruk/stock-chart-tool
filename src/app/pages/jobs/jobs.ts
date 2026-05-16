@@ -8,7 +8,7 @@ interface Job {
   name: string;
   description: string;
   schedule: string;
-  lastRunKey: 'fetchStockData' | 'marketSummary' | 'calculateRisks';
+  lastRunKey: 'fetchStockData' | 'marketSummary' | 'calculateRisks' | 'qaRefresh';
   note?: string;
 }
 
@@ -34,6 +34,14 @@ const JOBS: Job[] = [
     description: 'Monte Carlo simulation (2W / 1M / 3M / 6M) for all tracked symbols.',
     schedule: '11:00 PM UTC',
     lastRunKey: 'calculateRisks',
+  },
+  {
+    id: 'qa-refresh',
+    name: 'AI Insights Refresh',
+    description: 'Fetches FMP data and generates AI answers (overview, earnings, peers, management, sentiment) for all tracked symbols.',
+    schedule: '8:00 AM UTC',
+    lastRunKey: 'qaRefresh',
+    note: 'Runs in background — returns immediately.',
   },
 ];
 
@@ -115,6 +123,7 @@ export class JobsComponent implements OnInit, OnDestroy {
       'fetch-stock-data': s.fetchStockData,
       'market-summary':   s.marketSummary,
       'calculate-risks':  s.calculateRisks,
+      'qa-refresh':       s.qaRefresh,
     };
     return map[job.id] ?? null;
   }

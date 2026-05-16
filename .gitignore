@@ -43,4 +43,6 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-.env.claude/
+.env
+.env.*
+.claude/

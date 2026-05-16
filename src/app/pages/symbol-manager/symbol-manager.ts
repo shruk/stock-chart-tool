@@ -169,4 +169,6 @@ export class SymbolManagerComponent implements OnInit {
 
   goBack() { this.router.navigate(['/']); }
   goJobs() { this.router.navigate(['/jobs']); }
+  goDocs() { this.router.navigate(['/docs']); }
+  goLogs() { this.router.navigate(['/logs']); }
 }

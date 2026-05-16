@@ -1,0 +1,617 @@
+<div class="docs-page">
+  <header class="admin-header">
+    <nav class="admin-nav">
+      <button class="nav-btn" (click)="navigate('/')">Dashboard</button>
+      <button class="nav-btn" (click)="navigate('/admin')">Symbols</button>
+      <button class="nav-btn" (click)="navigate('/jobs')">Jobs</button>
+      <button class="nav-btn active">Docs</button>
+      <button class="nav-btn" (click)="navigate('/logs')">Logs</button>
+    </nav>
+  </header>
+
+  <div class="docs-inner">
+    <h1 class="docs-title">System Documentation</h1>
+    <p class="docs-subtitle">Stock Chart Tool — Azure Functions backend and Angular admin app</p>
+
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="tab() === 'functions'" (click)="tab.set('functions')">Functions (Backend)</button>
+      <button class="tab-btn" [class.active]="tab() === 'ui'" (click)="tab.set('ui')">UI Apps</button>
+    </div>
+
+    <!-- =================== FUNCTIONS TAB =================== -->
+    @if (tab() === 'functions') {
+
+      <!-- Scheduled Jobs -->
+      <section class="doc-section">
+        <h2 class="section-title">Scheduled Jobs</h2>
+        <p class="section-desc">All jobs run as Azure Functions timer triggers. They can also be triggered manually via HTTP POST from the Jobs page.</p>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Job</th>
+              <th>Schedule (UTC)</th>
+              <th>Cron</th>
+              <th>Route</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="job-name">Daily Price &amp; Analyst Fetch</span></td>
+              <td>9:30 PM</td>
+              <td><code>0 30 21 * * *</code></td>
+              <td><code>POST /api/jobs/run/fetch-stock-data</code></td>
+              <td>Backfills missing price bars and refreshes analyst data for all symbols. Runs in background.</td>
+            </tr>
+            <tr>
+              <td><span class="job-name">Market Summary (AI)</span></td>
+              <td>10:00 PM</td>
+              <td><code>0 0 22 * * *</code></td>
+              <td><code>POST /api/jobs/run/market-summary</code></td>
+              <td>Generates bilingual EN/ZH market overview using Groq AI.</td>
+            </tr>
+            <tr>
+              <td><span class="job-name">Risk Calculation</span></td>
+              <td>11:00 PM</td>
+              <td><code>0 0 23 * * *</code></td>
+              <td><code>POST /api/jobs/run/calculate-risks</code></td>
+              <td>Monte Carlo simulation (2W / 1M / 3M / 6M) for all tracked symbols.</td>
+            </tr>
+            <tr>
+              <td><span class="job-name">AI Insights Refresh</span></td>
+              <td>8:00 AM</td>
+              <td><code>0 0 8 * * *</code></td>
+              <td><code>POST /api/jobs/run/qa-refresh</code></td>
+              <td>Fetches FMP data and generates AI Q&amp;A answers (Q1–Q5) for all type=stock symbols. Runs in background.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- HTTP API Endpoints -->
+      <section class="doc-section">
+        <h2 class="section-title">HTTP API Endpoints</h2>
+        <p class="section-desc">Base URL: <code>https://stock-chart-tool-func.azurewebsites.net/api</code></p>
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Route</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/symbols</code></td>
+              <td>Returns all tracked symbols with bar count, date range, and hasAnalyst flag.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/chart/&#123;symbol&#125;</code></td>
+              <td>OHLCV price bars for a symbol (used by stock chart).</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/analyze/&#123;symbol&#125;</code></td>
+              <td>Returns cached AI analyst narrative from <code>analyst_cache</code>.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/risk/&#123;symbol&#125;</code></td>
+              <td>Returns Monte Carlo risk data (2W/1M/3M/6M loss probability and VaR 95%).</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/market-summary</code></td>
+              <td>Returns latest bilingual EN/ZH market summary.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/qa/&#123;symbol&#125;</code></td>
+              <td>Returns AI Insights Q1–Q5 data: overview, earnings, peers, management, sentiment.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/jobs/status</code></td>
+              <td>Returns running state, last-run timestamps, and schedule info for all jobs.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-get">GET</span></td>
+              <td><code>/logs?type=jobs|admin|ui&amp;hours=48</code></td>
+              <td>Queries Azure Application Insights via managed identity. Returns up to 300 log entries (timestamp, level, operation, message). <code>hours</code> range: 1–168.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-post">POST</span></td>
+              <td><code>/jobs/run/fetch-stock-data</code></td>
+              <td>Manually trigger the daily price fetch job.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-post">POST</span></td>
+              <td><code>/jobs/run/market-summary</code></td>
+              <td>Manually trigger market summary generation.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-post">POST</span></td>
+              <td><code>/jobs/run/calculate-risks</code></td>
+              <td>Manually trigger Monte Carlo risk calculation.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-post">POST</span></td>
+              <td><code>/jobs/run/qa-refresh</code></td>
+              <td>Manually trigger AI Insights Q1–Q5 refresh. Returns 202 immediately; runs in background.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-post">POST</span></td>
+              <td><code>/symbols</code></td>
+              <td>Add a new symbol to tracking.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-delete">DELETE</span></td>
+              <td><code>/symbols/&#123;symbol&#125;</code></td>
+              <td>Remove a symbol from tracking.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- External Services -->
+      <section class="doc-section">
+        <h2 class="section-title">External Services</h2>
+        <div class="cards-row">
+          <div class="service-card">
+            <div class="service-header">
+              <span class="service-badge" style="background:#dbeafe;color:#1d4ed8;">FMP</span>
+              <span class="service-name">Financial Modeling Prep</span>
+            </div>
+            <p class="service-desc">Market data provider. Used for price bars, analyst ratings, earnings, peers, key metrics, executives, short float, insider trading, and institutional holdings.</p>
+            <div class="service-endpoints">
+              <div class="ep-label">Key endpoints</div>
+              <code>/stable/income-statement</code>
+              <code>/stable/earnings-surprises</code>
+              <code>/stable/stock-peers</code>
+              <code>/stable/key-metrics</code>
+              <code>/stable/key-executives</code>
+              <code>/stable/analyst-estimates</code>
+              <code>/stable/institutional-holder</code>
+              <code>/stable/short-float</code>
+              <code>/stable/insider-trading</code>
+            </div>
+          </div>
+          <div class="service-card">
+            <div class="service-header">
+              <span class="service-badge" style="background:#ede9fe;color:#6d28d9;">Groq</span>
+              <span class="service-name">Groq AI (llama-3.3-70b-versatile)</span>
+            </div>
+            <p class="service-desc">AI inference provider for all text generation. Used in the nightly QA refresh job and the market summary job. Fast inference on llama-3.3-70b model.</p>
+            <div class="service-endpoints">
+              <div class="ep-label">Used for</div>
+              <code>Company overview (Q1)</code>
+              <code>Earnings commentary (Q2)</code>
+              <code>Peer metric selection + commentary (Q3)</code>
+              <code>Management story (Q4)</code>
+              <code>Sentiment commentary (Q5)</code>
+              <code>Market summary (EN + ZH)</code>
+              <code>Analyst narrative</code>
+            </div>
+          </div>
+          <div class="service-card">
+            <div class="service-header">
+              <span class="service-badge" style="background:#dcfce7;color:#15803d;">Supabase</span>
+              <span class="service-name">Supabase (PostgreSQL + PostgREST)</span>
+            </div>
+            <p class="service-desc">Database and REST API. All data is stored in Supabase. The Functions service calls PostgREST directly with an API key (no Supabase client SDK).</p>
+            <div class="service-endpoints">
+              <div class="ep-label">Tables</div>
+              <code>symbols</code>
+              <code>price_bars</code>
+              <code>analyst_cache</code>
+              <code>risk_cache</code>
+              <code>market_summary</code>
+              <code>symbol_qa</code>
+              <code>symbol_earnings</code>
+              <code>symbol_peer_comparison</code>
+              <code>symbol_sentiment</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI Insights Q1-Q5 Design -->
+      <section class="doc-section">
+        <h2 class="section-title">AI Insights — Q1–Q5 Design</h2>
+        <p class="section-desc">
+          Fixed AI-generated questions answered per symbol during the nightly job.
+          Answers are pre-generated and cached in Supabase, served instantly when a user opens a stock detail page.
+        </p>
+        <div class="meta-row">
+          <span class="badge badge-ai">AI-Powered</span>
+          <span class="badge badge-groq">Groq · llama-3.3-70b-versatile</span>
+          <span class="badge badge-nightly">Nightly Batch Generation</span>
+        </div>
+
+        <!-- Q1 -->
+        <div class="question-card">
+          <div class="question-header">
+            <div class="q-number">1</div>
+            <span class="q-label">Company Overview &amp; Market Conditions</span>
+            <span class="q-id">company-overview</span>
+          </div>
+          <div class="question-body">
+            <p class="parts-title">Answer covers three parts</p>
+            <ul class="parts-list">
+              <li><span class="part-icon">🏢</span><div class="part-text"><strong>What does this company do?</strong><span>Business model, core products/services, primary revenue sources, market position</span></div></li>
+              <li><span class="part-icon">📈</span><div class="part-text"><strong>How has it been performing recently?</strong><span>Recent earnings results, revenue growth, stock price momentum, analyst rating changes</span></div></li>
+              <li><span class="part-icon">🌐</span><div class="part-text"><strong>Any macro or micro conditions affecting it?</strong><span>Sector tailwinds/headwinds, regulatory environment, interest rate sensitivity, competition</span></div></li>
+            </ul>
+            <div class="specs-row">
+              <div class="spec-item"><div class="spec-label">Target Length</div><div class="spec-value">250 – 350 words</div></div>
+              <div class="spec-item"><div class="spec-label">Tone</div><div class="spec-value">Plain language · Investor-focused</div></div>
+              <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">symbol_qa · company-overview</div></div>
+            </div>
+            <p class="inputs-title">Data inputs to AI</p>
+            <div class="inputs-grid">
+              <span class="input-chip">Company name &amp; ticker</span>
+              <span class="input-chip">Sector &amp; industry</span>
+              <span class="input-chip">Company description</span>
+              <span class="input-chip">Price change 1M / 3M</span>
+              <span class="input-chip">Analyst consensus</span>
+              <span class="input-chip">P/E ratio</span>
+              <span class="input-chip">Market cap</span>
+              <span class="input-chip">Revenue growth YoY</span>
+              <span class="input-chip">Beta</span>
+              <span class="input-chip">52-week range position</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question-card">
+          <div class="question-header">
+            <div class="q-number">2</div>
+            <span class="q-label">Recent Financial Earnings</span>
+            <span class="q-id">earnings-history</span>
+          </div>
+          <div class="question-body">
+            <p class="parts-title">What is displayed</p>
+            <ul class="parts-list">
+              <li><span class="part-icon">📊</span><div class="part-text"><strong>Revenue bar chart (last 5 quarters)</strong><span>Quarterly total revenue with YoY % growth label</span></div></li>
+              <li><span class="part-icon">💰</span><div class="part-text"><strong>Net Income (last 5 quarters)</strong><span>Colour-coded positive (green) vs negative (red)</span></div></li>
+              <li><span class="part-icon">🎯</span><div class="part-text"><strong>EPS Actual vs Estimate</strong><span>Table row per quarter — actual EPS, consensus estimate, beat/miss (▲ / ▼)</span></div></li>
+              <li><span class="part-icon">🤖</span><div class="part-text"><strong>AI Commentary (2–3 sentences)</strong><span>Groq summarises the earnings trend: growth trajectory, consistency, notable beats/misses</span></div></li>
+            </ul>
+            <div class="specs-row">
+              <div class="spec-item"><div class="spec-label">Quarters</div><div class="spec-value">Last 5</div></div>
+              <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">symbol_earnings (structured) + symbol_qa earnings-commentary</div></div>
+              <div class="spec-item"><div class="spec-label">FMP Endpoints</div><div class="spec-value">/income-statement + /earnings-surprises</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question-card">
+          <div class="question-header">
+            <div class="q-number">3</div>
+            <span class="q-label">Peer Valuation Comparison</span>
+            <span class="q-id">peer-comparison</span>
+          </div>
+          <div class="question-body">
+            <p class="parts-title">What is displayed</p>
+            <ul class="parts-list">
+              <li><span class="part-icon">🏆</span><div class="part-text"><strong>Comparison table — main stock + 4–5 peers</strong><span>Main stock pinned at top, highlighted. Columns chosen by AI based on sector/industry.</span></div></li>
+              <li><span class="part-icon">🤖</span><div class="part-text"><strong>AI selects industry-relevant metrics</strong><span>Groq picks 2–3 valuation ratios — e.g. P/E+P/S for tech; P/B for banks; EV/EBITDA for industrials.</span></div></li>
+              <li><span class="part-icon">💬</span><div class="part-text"><strong>AI verdict (2–3 sentences)</strong><span>Is this stock cheap or expensive vs peers? What does the valuation gap signal?</span></div></li>
+            </ul>
+            <div class="specs-row">
+              <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">symbol_peer_comparison + symbol_qa peer-metrics / peer-commentary</div></div>
+              <div class="spec-item"><div class="spec-label">FMP</div><div class="spec-value">/stock-peers + /key-metrics + /profile</div></div>
+            </div>
+            <div class="info-box">
+              <strong>Metric columns available (AI selects which to show):</strong>
+              pe_ratio, ps_ratio, pb_ratio, ev_ebitda, dividend_yield. Always shown: ticker, stock price, market cap.
+            </div>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question-card">
+          <div class="question-header">
+            <div class="q-number">4</div>
+            <span class="q-label">Management &amp; Upcoming Guidance</span>
+            <span class="q-id">management-story</span>
+          </div>
+          <div class="question-body">
+            <p class="parts-title">Answer covers four parts</p>
+            <ul class="parts-list">
+              <li><span class="part-icon">👤</span><div class="part-text"><strong>Leadership overview</strong><span>CEO name, tenure, notable background, recent executive changes</span></div></li>
+              <li><span class="part-icon">🗺️</span><div class="part-text"><strong>Strategic direction</strong><span>What management is focused on — expansion, cost-cutting, M&amp;A, new products, geographic growth</span></div></li>
+              <li><span class="part-icon">📋</span><div class="part-text"><strong>Recent guidance &amp; forward estimates</strong><span>Revenue and EPS guidance vs analyst forward estimates; whether guidance was raised/lowered</span></div></li>
+              <li><span class="part-icon">📅</span><div class="part-text"><strong>Upcoming catalyst</strong><span>Next earnings date, analyst day, product launch, regulatory decision</span></div></li>
+            </ul>
+            <div class="specs-row">
+              <div class="spec-item"><div class="spec-label">Length</div><div class="spec-value">200–300 words</div></div>
+              <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">symbol_qa · management-story</div></div>
+              <div class="spec-item"><div class="spec-label">FMP</div><div class="spec-value">/key-executives + /analyst-estimates</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question-card">
+          <div class="question-header">
+            <div class="q-number">5</div>
+            <span class="q-label">Retail &amp; Institutional Sentiment</span>
+            <span class="q-id">sentiment</span>
+          </div>
+          <div class="question-body">
+            <p class="parts-title">What is displayed</p>
+            <ul class="parts-list">
+              <li><span class="part-icon">🎯</span><div class="part-text"><strong>Composite sentiment score — 0 to 100 gauge</strong><span>Arc gauge: 0–35 Bearish (red), 36–64 Neutral (yellow), 65–100 Bullish (green)</span></div></li>
+              <li><span class="part-icon">🏛️</span><div class="part-text"><strong>Signal 1 — Analyst consensus</strong><span>Weighted avg of strongBuy/buy/hold/sell/strongSell → 0–25 pts</span></div></li>
+              <li><span class="part-icon">📉</span><div class="part-text"><strong>Signal 2 — Short interest</strong><span>&lt;5% float shorted = 25 pts, 5–15% = 12 pts, &gt;15% = 0 pts</span></div></li>
+              <li><span class="part-icon">👔</span><div class="part-text"><strong>Signal 3 — Insider activity (90d)</strong><span>Net buying = 25 pts, mixed = 12 pts, net selling = 0 pts</span></div></li>
+              <li><span class="part-icon">🏦</span><div class="part-text"><strong>Signal 4 — Institutional ownership</strong><span>&gt;75% = 25 pts, 50–75% = 12 pts, &lt;50% = 0 pts</span></div></li>
+              <li><span class="part-icon">🤖</span><div class="part-text"><strong>AI commentary (2–3 sentences)</strong><span>Groq interprets the signal mix in plain language</span></div></li>
+            </ul>
+            <div class="score-formula">
+              <p class="parts-title" style="margin-bottom:10px;">Score formula</p>
+              <table class="doc-table">
+                <thead>
+                  <tr><th>Signal</th><th>Bullish (25 pts)</th><th>Neutral (12 pts)</th><th>Bearish (0 pts)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Analyst consensus</td><td class="bull">Avg ≥ 4.0</td><td class="neut">Avg 3.0–3.9</td><td class="bear">Avg &lt; 3.0</td></tr>
+                  <tr><td>Short interest</td><td class="bull">Float &lt; 5%</td><td class="neut">5–15%</td><td class="bear">&gt; 15%</td></tr>
+                  <tr><td>Insider activity</td><td class="bull">Net buying</td><td class="neut">Mixed</td><td class="bear">Net selling</td></tr>
+                  <tr><td>Institutional ownership</td><td class="bull">&gt; 75%</td><td class="neut">50–75%</td><td class="bear">&lt; 50%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="specs-row" style="margin-top:14px;">
+              <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">symbol_sentiment + symbol_qa sentiment-commentary</div></div>
+              <div class="spec-item"><div class="spec-label">FMP</div><div class="spec-value">/institutional-holder + /short-float + /insider-trading</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Database Tables -->
+      <section class="doc-section">
+        <h2 class="section-title">Database Tables (Supabase)</h2>
+        <table class="doc-table">
+          <thead>
+            <tr><th>Table</th><th>Primary Key</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>symbols</code></td><td>symbol</td><td>List of tracked symbols with type (stock/index/etf) and metadata</td></tr>
+            <tr><td><code>price_bars</code></td><td>(symbol, date)</td><td>Daily OHLCV price bars</td></tr>
+            <tr><td><code>analyst_cache</code></td><td>symbol</td><td>FMP analyst data: profile, recommendation counts, price target, next earnings date</td></tr>
+            <tr><td><code>risk_cache</code></td><td>symbol</td><td>Monte Carlo risk results: loss probability + VaR 95% for 4 horizons</td></tr>
+            <tr><td><code>market_summary</code></td><td>id (single row)</td><td>Latest bilingual EN/ZH market overview text</td></tr>
+            <tr><td><code>symbol_qa</code></td><td>(symbol, question_id)</td><td>Text AI answers: company-overview, earnings-commentary, peer-metrics, peer-commentary, management-story, sentiment-commentary</td></tr>
+            <tr><td><code>symbol_earnings</code></td><td>(symbol, fiscal_date)</td><td>Structured quarterly earnings data (revenue, net income, EPS actual/estimate/surprise)</td></tr>
+            <tr><td><code>symbol_peer_comparison</code></td><td>(symbol, peer_symbol)</td><td>Peer valuation snapshot: price, market cap, P/E, P/S, P/B, EV/EBITDA, dividend yield</td></tr>
+            <tr><td><code>symbol_sentiment</code></td><td>symbol</td><td>Structured sentiment data: score, analyst score, short float %, insider counts, institutional ownership %</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+    }
+
+    <!-- =================== UI APPS TAB =================== -->
+    @if (tab() === 'ui') {
+
+      <!-- Admin App -->
+      <section class="doc-section">
+        <h2 class="section-title">Admin App (Angular)</h2>
+        <p class="section-desc">
+          Angular 17+ standalone component app deployed to Azure Static Web Apps.
+          Uses signal-based state management throughout. Supabase Auth for admin-only access.
+        </p>
+
+        <div class="screen-grid">
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge">Dashboard</span>
+              <code class="screen-route">/</code>
+            </div>
+            <p class="screen-desc">Main view showing all tracked symbols as stock chart cards. Displays price chart (OHLCV), analyst rating badge, and quick stats per symbol.</p>
+            <ul class="screen-features">
+              <li>Custom watchlist — user can add/remove symbols from their personal list</li>
+              <li>Risk chart per symbol (2W/1M/3M/6M loss probability bars)</li>
+              <li>Bilingual market summary (EN/ZH) shown at top</li>
+              <li>Test Mode — fake data overlay for demo purposes</li>
+              <li>Click any symbol card → Stock Detail page</li>
+            </ul>
+          </div>
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge">Stock Detail</span>
+              <code class="screen-route">/stock/:symbol</code>
+            </div>
+            <p class="screen-desc">Full-page view for a single symbol with all available data panels stacked vertically.</p>
+            <ul class="screen-features">
+              <li>Large OHLCV candlestick / bar chart</li>
+              <li>Analyst panel — price target, consensus gauge, recommendation breakdown, next earnings date</li>
+              <li>Risk panel — Monte Carlo results for 4 horizons</li>
+              <li>QA panel — AI Insights Q1–Q5 (company overview, earnings chart, peer table, management, sentiment gauge)</li>
+            </ul>
+          </div>
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge">Symbol Manager</span>
+              <code class="screen-route">/admin</code>
+            </div>
+            <p class="screen-desc">Admin-only tool to manage the tracked symbol list. Grouped into default indices and user-added stocks.</p>
+            <ul class="screen-features">
+              <li>Add new symbols (stock, ETF, index) with type selection</li>
+              <li>View bar count, date range, and analyst data status per symbol</li>
+              <li>Remove symbols</li>
+              <li>Analyst last refresh time displayed per symbol</li>
+            </ul>
+          </div>
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge">Jobs</span>
+              <code class="screen-route">/jobs</code>
+            </div>
+            <p class="screen-desc">Admin-only dashboard for monitoring and manually triggering the four backend jobs.</p>
+            <ul class="screen-features">
+              <li>Shows schedule time in user's local timezone (converted from UTC)</li>
+              <li>Active/Inactive status badge for each job's Azure timer trigger</li>
+              <li>Last run timestamp (local time)</li>
+              <li>Run Now button — triggers the job via HTTP POST</li>
+              <li>Live elapsed timer for long-running jobs (polling every 5s)</li>
+            </ul>
+          </div>
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge">Docs</span>
+              <code class="screen-route">/docs</code>
+            </div>
+            <p class="screen-desc">System documentation for the entire stack, separated by Functions (backend) and UI Apps (frontend).</p>
+          </div>
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge">Logs</span>
+              <code class="screen-route">/logs</code>
+            </div>
+            <p class="screen-desc">Live log viewer pulling from Azure Application Insights. Three tabs cover different scopes of the system.</p>
+            <ul class="screen-features">
+              <li><strong>Jobs tab</strong> — traces and exceptions from the 4 job function executions (QaRefresh, FetchStockData, MarketSummary, CalculateRisks)</li>
+              <li><strong>Admin tab</strong> — all other Function app traces, HTTP requests, and exceptions (API calls from admin and UI apps)</li>
+              <li><strong>UI tab</strong> — browser telemetry (requires Application Insights SDK in the frontend)</li>
+              <li>Time range selector: 6h / 24h / 48h / 3d / 7d</li>
+              <li>Severity badges: Verbose / Info / Warning / Error / Critical — error rows highlighted red</li>
+              <li>Backend uses managed identity to query App Insights REST API — no key in frontend</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- React Native App -->
+      <section class="doc-section">
+        <h2 class="section-title">Mobile App (React Native / Expo)</h2>
+        <p class="section-desc">
+          React Native app using Expo Router for file-based navigation. Deployed via Expo.
+          Calls the same Azure Functions API as the admin app.
+        </p>
+
+        <div class="screen-grid">
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge screen-badge-rn">Watchlist</span>
+              <code class="screen-route">app/index.tsx</code>
+            </div>
+            <p class="screen-desc">Shows the user's personal watchlist of symbols. Each row displays ticker, company name, latest price, and price change.</p>
+            <ul class="screen-features">
+              <li>Add/remove symbols from watchlist via symbol search</li>
+              <li>Pull to refresh</li>
+              <li>Tap a symbol → Stock Detail</li>
+            </ul>
+          </div>
+
+          <div class="screen-card">
+            <div class="screen-header">
+              <span class="screen-badge screen-badge-rn">Stock Detail</span>
+              <code class="screen-route">app/stock/[symbol].tsx</code>
+            </div>
+            <p class="screen-desc">Full detail page for a symbol showing all five AI Insight sections plus price data.</p>
+            <ul class="screen-features">
+              <li>Q1: Company overview text card</li>
+              <li>Q2: Earnings — revenue bars, net income bars, EPS beat/miss table, AI commentary</li>
+              <li>Q3: Peer comparison table (horizontal scroll) with AI-selected metrics + verdict</li>
+              <li>Q4: Management &amp; guidance narrative</li>
+              <li>Q5: Sentiment gauge (0–100) + 4 signal cards + AI commentary</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- QA Panel Architecture -->
+      <section class="doc-section">
+        <h2 class="section-title">QA Panel (Angular) — Component Architecture</h2>
+        <p class="section-desc">
+          <code>src/app/components/qa-panel/</code> — Signal-based Angular standalone component.
+          Receives <code>[data]</code> and <code>[loading]</code> inputs. All rendering is computed from these two signals.
+        </p>
+        <table class="doc-table">
+          <thead>
+            <tr><th>Property / Method</th><th>Type</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>data</code></td><td>input&lt;SymbolQa | null&gt;</td><td>Full Q1–Q5 data object from API</td></tr>
+            <tr><td><code>loading</code></td><td>input&lt;boolean&gt;</td><td>Shows skeleton/loading state</td></tr>
+            <tr><td><code>maxRevenue()</code></td><td>computed</td><td>Max revenue across 5 quarters — used to scale bar heights</td></tr>
+            <tr><td><code>maxAbsNetIncome()</code></td><td>computed</td><td>Max |net income| for bar scaling</td></tr>
+            <tr><td><code>metricLabel(key)</code></td><td>method</td><td>Human-readable label for peer metric keys</td></tr>
+            <tr><td><code>metricValue(peer, key)</code></td><td>method</td><td>Formatted value for a given metric key from a peer row</td></tr>
+            <tr><td><code>gaugeColor()</code></td><td>computed</td><td>Red / yellow / green based on sentiment score</td></tr>
+            <tr><td><code>gaugeFillLen()</code></td><td>computed</td><td>SVG stroke-dasharray length for arc gauge fill</td></tr>
+            <tr><td><code>gaugeLabel()</code></td><td>computed</td><td>Bearish / Neutral / Bullish label</td></tr>
+            <tr><td><code>signalStatus(value, signal)</code></td><td>method</td><td>Returns bull/neut/bear class + label for each sentiment signal card</td></tr>
+            <tr><td><code>formatInsiderNet(val)</code></td><td>method</td><td>Formats insider net value in $M or $B</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- API Shape -->
+      <section class="doc-section">
+        <h2 class="section-title">GET /api/qa/&#123;symbol&#125; — Response Shape</h2>
+        <pre class="code-block">&#123;
+  "symbol": "AAPL",
+  "companyOverview": "Apple is...",            // Q1 text
+  "earnings": &#123;
+    "quarters": [&#123;                             // Q2 structured data
+      "period": "Q1 2025",
+      "fiscalDate": "2024-12-28",
+      "revenue": 124300000000,
+      "revenueGrowthYoy": 0.0421,
+      "netIncome": 36330000000,
+      "eps": 2.4,
+      "epsEstimate": 2.35,
+      "epsSurprise": 0.05
+    &#125;],
+    "commentary": "Apple delivered..."          // Q2 AI text
+  &#125;,
+  "peers": &#123;
+    "companies": [&#123;                           // Q3 structured data
+      "peerSymbol": "MSFT",
+      "isSelf": false,
+      "companyName": "Microsoft",
+      "stockPrice": 420.5,
+      "marketCap": 3100000000000,
+      "peRatio": 35.2,
+      "psRatio": 12.1
+    &#125;],
+    "selectedMetrics": ["pe_ratio","ps_ratio"], // AI-chosen columns
+    "commentary": "Apple trades at..."          // Q3 AI verdict
+  &#125;,
+  "management": "Tim Cook has led...",          // Q4 text
+  "sentiment": &#123;                              // Q5 structured + AI text
+    "sentimentScore": 75,
+    "analystScore": 4.2,
+    "shortFloatPct": 0.008,
+    "daysToCover": 1.4,
+    "insiderBuys90d": 2,
+    "insiderSells90d": 5,
+    "insiderNetValue90d": -12400000,
+    "institutionalOwnershipPct": 0.612,
+    "topInstitutionName": "Vanguard Group",
+    "commentary": "Mixed signals..."           // Q5 AI text
+  &#125;
+&#125;</pre>
+      </section>
+
+    }
+  </div>
+</div>

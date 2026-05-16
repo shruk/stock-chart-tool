@@ -1,0 +1,259 @@
+.qa-panel {
+  background: #0f172a;
+  border-top: 1px solid #1e293b;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.qa-loading {
+  font-size: 13px;
+  color: #64748b;
+  padding: 8px 0;
+}
+
+.qa-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Card */
+.qa-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.qa-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.qa-text {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.65;
+  margin: 0;
+  white-space: pre-line;
+
+  &.commentary {
+    border-top: 1px solid #334155;
+    padding-top: 12px;
+    font-style: italic;
+  }
+}
+
+/* ── Q2 Earnings bar chart ─────────────────────────────────────── */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 100px;
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 80px;
+  width: 100%;
+}
+
+.bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  transition: height 0.3s ease;
+  min-height: 4px;
+
+  &.rev  { background: #3b82f6; }
+  &.ni   { background: #22c55e; }
+  &.ni.negative { background: #ef4444; }
+}
+
+.bar-label {
+  font-size: 9px;
+  color: #475569;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.bar-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+
+  .leg { color: #64748b; }
+  .rev-leg { color: #3b82f6; }
+  .ni-leg  { color: #22c55e; }
+}
+
+/* ── EPS table ─────────────────────────────────────────────────── */
+.eps-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+
+  th {
+    color: #475569;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 4px 8px 8px;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+  }
+
+  td {
+    padding: 6px 8px;
+    color: #94a3b8;
+    border-bottom: 1px solid #1e293b;
+
+    &.neg  { color: #f87171; }
+    &.beat { color: #22c55e; font-weight: 600; }
+    &.miss { color: #f87171; font-weight: 600; }
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+/* ── Q3 Peer table ─────────────────────────────────────────────── */
+.peer-table-wrap {
+  overflow-x: auto;
+}
+
+.peer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+
+  th {
+    color: #475569;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 4px 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 7px 10px;
+    color: #94a3b8;
+    border-bottom: 1px solid #1e293b;
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr.self-row td {
+    background: #1a2744;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+}
+
+.ticker-cell {
+  color: #f1f5f9 !important;
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.self-badge {
+  font-size: 9px;
+  font-weight: 700;
+  background: #1d4ed8;
+  color: #bfdbfe;
+  padding: 1px 5px;
+  border-radius: 99px;
+}
+
+.name-cell {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Q5 Sentiment ──────────────────────────────────────────────── */
+.sentiment-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.gauge-wrap {
+  flex-shrink: 0;
+}
+
+.signal-cards {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  min-width: 240px;
+}
+
+.signal-card {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.bullish { border-color: #16a34a; background: #052e16; }
+  &.neutral  { border-color: #a16207; background: #1c1400; }
+  &.bearish  { border-color: #dc2626; background: #2d0a0a; }
+}
+
+.sig-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sig-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.sig-sub {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.net-value {
+  font-size: 11px;
+  color: #94a3b8;
+}

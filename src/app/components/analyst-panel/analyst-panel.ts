@@ -1,6 +1,7 @@
 import { Component, input, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { AnalystData } from '../../services/finnhub';
+import { RiskData } from '../../services/functions.service';
 
 @Component({
   selector: 'app-analyst-panel',
@@ -10,9 +11,10 @@ import { AnalystData } from '../../services/finnhub';
   styleUrl: './analyst-panel.scss'
 })
 export class AnalystPanelComponent {
-  readonly data = input<AnalystData | null>(null);
-  readonly loading = input(false);
+  readonly data        = input<AnalystData | null>(null);
+  readonly loading     = input(false);
   readonly currentPrice = input<number | null>(null);
+  readonly riskData    = input<RiskData | null>(null);
 
   readonly rec     = computed(() => this.data()?.recommendation ?? null);
   readonly target  = computed(() => this.data()?.priceTarget ?? null);
@@ -97,10 +99,27 @@ export class AnalystPanelComponent {
     return Math.max(0, Math.min(100, ((t.targetMean - t.targetLow) / range) * 100));
   });
 
+  readonly riskRows = computed(() => {
+    const r = this.riskData();
+    if (!r) return [];
+    return [
+      { label: '2 Weeks',  h: r.twoWeek },
+      { label: '1 Month',  h: r.oneMonth },
+      { label: '3 Months', h: r.threeMonth },
+      { label: '6 Months', h: r.sixMonth },
+    ];
+  });
+
   formatMarketCap(val: number | null | undefined): string {
     if (!val) return '—';
     if (val >= 1_000_000) return `$${(val / 1_000_000).toFixed(2)}T`;
     if (val >= 1_000) return `$${(val / 1_000).toFixed(2)}B`;
     return `$${val.toFixed(0)}M`;
+  }
+
+  riskClass(prob: number): string {
+    if (prob > 0.55) return 'risk-hi';
+    if (prob > 0.4)  return 'risk-mid';
+    return 'risk-lo';
   }
 }

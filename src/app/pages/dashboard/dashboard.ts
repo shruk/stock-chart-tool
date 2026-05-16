@@ -252,5 +252,7 @@ export class DashboardComponent implements OnInit {
   openStock(symbol: string) { this.router.navigate(['/stock', symbol]); }
   openAdmin() { this.router.navigate(['/admin']); }
   openJobs()  { this.router.navigate(['/jobs']); }
+  openDocs()  { this.router.navigate(['/docs']); }
+  openLogs()  { this.router.navigate(['/logs']); }
   openLogin() { this.router.navigate(['/login']); }
 }

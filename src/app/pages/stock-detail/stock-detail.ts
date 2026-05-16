@@ -4,23 +4,26 @@ import { SearchBarComponent, SearchParams } from '../../components/search-bar/se
 import { StockChartComponent } from '../../components/stock-chart/stock-chart';
 import { SettingsPanelComponent } from '../../components/settings-panel/settings-panel';
 import { AnalystPanelComponent } from '../../components/analyst-panel/analyst-panel';
+import { QaPanelComponent } from '../../components/qa-panel/qa-panel';
 import { Bar } from '../../services/polygon';
 import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
 import { MockDataService } from '../../services/mock-data';
+import { FunctionsService, SymbolQa, RiskData } from '../../services/functions.service';
 
 @Component({
   selector: 'app-stock-detail',
   standalone: true,
-  imports: [SearchBarComponent, StockChartComponent, SettingsPanelComponent, AnalystPanelComponent],
+  imports: [SearchBarComponent, StockChartComponent, SettingsPanelComponent, AnalystPanelComponent, QaPanelComponent],
   templateUrl: './stock-detail.html',
   styleUrl: './stock-detail.scss'
 })
 export class StockDetailComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private supabaseSvc = inject(SupabaseService);
-  private mockDataSvc = inject(MockDataService);
+  private route        = inject(ActivatedRoute);
+  private router       = inject(Router);
+  private supabaseSvc  = inject(SupabaseService);
+  private mockDataSvc  = inject(MockDataService);
+  private functionsSvc = inject(FunctionsService);
 
   bars = signal<Bar[]>([]);
   symbol = signal('');
@@ -28,16 +31,22 @@ export class StockDetailComponent implements OnInit {
   error = signal('');
   testMode = signal(false);
 
-  analystData = signal<AnalystData | null>(null);
+  analystData    = signal<AnalystData | null>(null);
   analystLoading = signal(false);
 
-  showSMA20 = signal(true);
-  showSMA50 = signal(true);
+  qaData    = signal<SymbolQa | null>(null);
+  qaLoading = signal(false);
+
+  riskData    = signal<RiskData | null>(null);
+  riskLoading = signal(false);
+
+  showSMA20  = signal(true);
+  showSMA50  = signal(true);
   showSMA100 = signal(false);
-  showBB = signal(false);
+  showBB     = signal(false);
   showVolume = signal(true);
-  showRSI = signal(false);
-  showMACD = signal(false);
+  showRSI    = signal(false);
+  showMACD   = signal(false);
 
   readonly currentPrice = computed(() => {
     const b = this.bars();
@@ -50,6 +59,8 @@ export class StockDetailComponent implements OnInit {
     if (sym) {
       this.loadPrices(sym.toUpperCase(), '3M');
       this.loadAnalyst(sym.toUpperCase());
+      this.loadQa(sym.toUpperCase());
+      this.loadRisk(sym.toUpperCase());
     }
   }
 
@@ -58,10 +69,8 @@ export class StockDetailComponent implements OnInit {
       this.bars.set(this.mockDataSvc.generate(timeframe as any));
       return;
     }
-
     this.loading.set(true);
     this.error.set('');
-
     const bars = await this.supabaseSvc.getPriceBars(sym, this.getFromDate(timeframe));
     if (bars?.length) {
       this.bars.set(bars);
@@ -74,10 +83,27 @@ export class StockDetailComponent implements OnInit {
   private async loadAnalyst(sym: string) {
     this.analystLoading.set(true);
     this.analystData.set(null);
-
     const data = await this.supabaseSvc.getAnalystData(sym);
     this.analystData.set(data);
     this.analystLoading.set(false);
+  }
+
+  private loadQa(sym: string) {
+    this.qaLoading.set(true);
+    this.qaData.set(null);
+    this.functionsSvc.getSymbolQa(sym).subscribe({
+      next:  qa => { this.qaData.set(qa); this.qaLoading.set(false); },
+      error: ()  => this.qaLoading.set(false),
+    });
+  }
+
+  private loadRisk(sym: string) {
+    this.riskLoading.set(true);
+    this.riskData.set(null);
+    this.functionsSvc.getSymbolRisk(sym).subscribe({
+      next:  r  => { this.riskData.set(r); this.riskLoading.set(false); },
+      error: () => this.riskLoading.set(false),
+    });
   }
 
   toggleTestMode() {
@@ -91,6 +117,7 @@ export class StockDetailComponent implements OnInit {
     } else {
       this.bars.set([]);
       this.analystData.set(null);
+      this.riskData.set(null);
       this.loadPrices(this.symbol(), '3M');
       this.loadAnalyst(this.symbol());
     }
@@ -109,6 +136,8 @@ export class StockDetailComponent implements OnInit {
 
     this.loadPrices(sym, params.timeframe);
     this.loadAnalyst(sym);
+    this.loadQa(sym);
+    this.loadRisk(sym);
   }
 
   goBack() { this.router.navigate(['/']); }
