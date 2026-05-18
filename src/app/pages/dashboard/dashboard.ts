@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Bar } from '../../services/polygon';
 import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
-import { FunctionsService, RiskData } from '../../services/functions.service';
+import { FunctionsService } from '../../services/functions.service';
 import { MockDataService } from '../../services/mock-data';
 import { AuthService } from '../../services/auth.service';
 
@@ -18,8 +18,6 @@ interface StockCard {
   error: string;
   analyst: AnalystData | null;
   analystLoading: boolean;
-  risk: RiskData | null;
-  riskLoading: boolean;
 }
 
 
@@ -69,7 +67,6 @@ export class DashboardComponent implements OnInit {
           symbol, name: symbol,
           price: null, change: null, changePct: null,
           loading: true, error: '', analyst: null, analystLoading: true,
-          risk: null, riskLoading: true
         })));
         this.loadingSymbols.set(false);
         symbols.forEach(symbol => this.loadStock(symbol));
@@ -101,15 +98,6 @@ export class DashboardComponent implements OnInit {
         } : s
       ));
     });
-
-    this.functionsSvc.getSymbolRisk(symbol).subscribe({
-      next: risk => this.stocks.update(list => list.map(s =>
-        s.symbol === symbol ? { ...s, risk: risk?.twoWeek ? risk : null, riskLoading: false } : s
-      )),
-      error: () => this.stocks.update(list => list.map(s =>
-        s.symbol === symbol ? { ...s, riskLoading: false } : s
-      )),
-    });
   }
 
   private loadMockData() {
@@ -119,14 +107,6 @@ export class DashboardComponent implements OnInit {
       return {
         ...s, ...summary, loading: false,
         analyst: this.mockDataSvc.generateAnalyst(summary.price ?? 150), analystLoading: false,
-        risk: {
-          twoWeek:    { lossProbability: 0.12, var95: -0.08 },
-          oneMonth:   { lossProbability: 0.19, var95: -0.13 },
-          threeMonth: { lossProbability: 0.28, var95: -0.20 },
-          sixMonth:   { lossProbability: 0.37, var95: -0.27 },
-          calculatedAt: new Date().toISOString(),
-        },
-        riskLoading: false,
       };
     }));
   }
@@ -135,17 +115,6 @@ export class DashboardComponent implements OnInit {
     const d = new Date();
     d.setDate(d.getDate() - days);
     return d.toISOString().split('T')[0];
-  }
-
-  riskHorizons(card: StockCard): { label: string; lossPct: number; var95abs: number }[] {
-    const r = card.risk;
-    if (!r) return [];
-    return [
-      { label: '2W',  lossPct: r.twoWeek.lossProbability,    var95abs: Math.abs(r.twoWeek.var95) },
-      { label: '1M',  lossPct: r.oneMonth.lossProbability,   var95abs: Math.abs(r.oneMonth.var95) },
-      { label: '3M',  lossPct: r.threeMonth.lossProbability, var95abs: Math.abs(r.threeMonth.var95) },
-      { label: '6M',  lossPct: r.sixMonth.lossProbability,   var95abs: Math.abs(r.sixMonth.var95) },
-    ];
   }
 
   private summarize(bars: Bar[]): Pick<StockCard, 'price' | 'change' | 'changePct'> {

@@ -61,33 +61,7 @@
           }
         </div>
 
-        <!-- Risk chart -->
-        @if (stock.riskLoading) {
-          <div class="risk-skeleton"></div>
-        } @else if (stock.risk) {
-          <div class="risk-section">
-            <div class="risk-title">Loss Probability · Monte Carlo</div>
-            @for (h of riskHorizons(stock); track h.label) {
-              <div class="risk-row">
-                <span class="risk-label">{{ h.label }}</span>
-                <div class="risk-track">
-                  <div class="risk-bar"
-                    [style.width.%]="h.lossPct * 100"
-                    [class.risk-low]="h.lossPct < 0.2"
-                    [class.risk-mid]="h.lossPct >= 0.2 && h.lossPct < 0.35"
-                    [class.risk-high]="h.lossPct >= 0.35">
-                  </div>
-                </div>
-                <span class="risk-val">{{ (h.lossPct * 100) | number:'1.0-0' }}%</span>
-                <span class="risk-var">-{{ (h.var95abs * 100) | number:'1.1-1' }}%</span>
-              </div>
-            }
-          </div>
-        } @else {
-          <div class="risk-no-data">No risk data — run calculation in Jobs</div>
-        }
-
-        @if (auth.isMember()) {
+@if (auth.isMember()) {
           <div class="drill-hint">View full chart &#8594;</div>
         } @else {
           <div class="drill-hint guest">Sign in to view full chart &#8594;</div>
