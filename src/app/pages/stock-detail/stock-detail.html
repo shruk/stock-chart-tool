@@ -28,7 +28,7 @@
     <!-- Right: chart + Q&A -->
     <div class="right-main">
 
-      <app-search-bar (search)="onSearch($event)" />
+      <app-search-bar [initialSymbol]="symbol()" (search)="onSearch($event)" />
 
       <div class="toolbar">
         <span class="label">Indicators:</span>

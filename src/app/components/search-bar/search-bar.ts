@@ -1,4 +1,4 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, input, output, signal, effect } from '@angular/core';
 
 export interface SearchParams {
   symbol: string;
@@ -23,10 +23,18 @@ function savedTimeframe(): SearchParams['timeframe'] {
   styleUrl: './search-bar.scss'
 })
 export class SearchBarComponent {
+  readonly initialSymbol = input<string>('');
   readonly search = output<SearchParams>();
 
-  symbol = signal('AAPL');
+  symbol = signal('');
   timeframe = signal<SearchParams['timeframe']>(savedTimeframe());
+
+  constructor() {
+    effect(() => {
+      const s = this.initialSymbol();
+      if (s) this.symbol.set(s);
+    });
+  }
 
   readonly timeframes: SearchParams['timeframe'][] = [...VALID_TFS];
 
