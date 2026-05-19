@@ -54,14 +54,16 @@ export class StockDetailComponent implements OnInit {
   });
 
   ngOnInit() {
-    const sym = this.route.snapshot.paramMap.get('symbol') ?? '';
-    this.symbol.set(sym.toUpperCase());
-    if (sym) {
-      this.loadPrices(sym.toUpperCase(), '3M');
-      this.loadAnalyst(sym.toUpperCase());
-      this.loadQa(sym.toUpperCase());
-      this.loadRisk(sym.toUpperCase());
-    }
+    this.route.paramMap.subscribe(params => {
+      const sym = (params.get('symbol') ?? '').toUpperCase();
+      this.symbol.set(sym);
+      if (sym) {
+        this.loadPrices(sym, '3M');
+        this.loadAnalyst(sym);
+        this.loadQa(sym);
+        this.loadRisk(sym);
+      }
+    });
   }
 
   private async loadPrices(sym: string, timeframe: string) {
