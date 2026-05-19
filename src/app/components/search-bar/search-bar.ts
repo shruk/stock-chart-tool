@@ -5,6 +5,16 @@ export interface SearchParams {
   timeframe: '1D' | '1W' | '1M' | '3M' | '6M' | '1Y' | '2Y' | '5Y' | '10Y';
 }
 
+const TF_KEY = 'preferred_timeframe';
+const VALID_TFS = ['1D', '1W', '1M', '3M', '6M', '1Y', '2Y', '5Y', '10Y'] as const;
+
+function savedTimeframe(): SearchParams['timeframe'] {
+  const saved = localStorage.getItem(TF_KEY);
+  return (VALID_TFS as readonly string[]).includes(saved ?? '')
+    ? (saved as SearchParams['timeframe'])
+    : '3M';
+}
+
 @Component({
   selector: 'app-search-bar',
   standalone: true,
@@ -16,12 +26,13 @@ export class SearchBarComponent {
   readonly search = output<SearchParams>();
 
   symbol = signal('AAPL');
-  timeframe = signal<SearchParams['timeframe']>('3M');
+  timeframe = signal<SearchParams['timeframe']>(savedTimeframe());
 
-  readonly timeframes: SearchParams['timeframe'][] = ['1D', '1W', '1M', '3M', '6M', '1Y', '2Y', '5Y', '10Y'];
+  readonly timeframes: SearchParams['timeframe'][] = [...VALID_TFS];
 
   selectTimeframe(tf: SearchParams['timeframe']) {
     this.timeframe.set(tf);
+    localStorage.setItem(TF_KEY, tf);
     this.emit();
   }
 

@@ -63,7 +63,8 @@ export class StockDetailComponent implements OnInit {
       this.qaData.set(null);
       this.riskData.set(null);
       if (sym) {
-        this.loadPrices(sym, '3M');
+        const tf = (localStorage.getItem('preferred_timeframe') ?? '3M') as any;
+        this.loadPrices(sym, tf);
         this.loadAnalyst(sym);
         this.loadQa(sym);
         this.loadRisk(sym);
