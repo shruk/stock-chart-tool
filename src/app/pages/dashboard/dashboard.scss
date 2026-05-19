@@ -75,27 +75,27 @@
 /* ── Grid ─────────────────────────────────────── */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
-  padding: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px;
 }
 
 /* ── Card ─────────────────────────────────────── */
 .card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 22px;
+  border-radius: 10px;
+  padding: 14px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 8px;
   transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
 
   &:hover {
     border-color: #3b82f6;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px #94a3b820;
+    box-shadow: 0 4px 16px #94a3b820;
   }
 }
 
@@ -104,20 +104,20 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .symbol {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 700;
   color: #0f172a;
   line-height: 1;
 }
 
 .name {
-  font-size: 12px;
+  font-size: 11px;
   color: #94a3b8;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .price-block {
@@ -127,14 +127,14 @@
 }
 
 .price {
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
   color: #0f172a;
 }
 
 .change {
-  font-size: 12px;
-  margin-top: 3px;
+  font-size: 11px;
+  margin-top: 2px;
   color: #64748b;
 }
 
@@ -165,8 +165,8 @@
 }
 
 .price-loading {
-  width: 80px;
-  height: 36px;
+  width: 64px;
+  height: 28px;
   background: #f1f5f9;
   border-radius: 6px;
   animation: pulse 1.5s infinite;
@@ -477,7 +477,7 @@ app-sparkline {
 
 /* ── Drill hint ────────────────────────────────── */
 .drill-hint {
-  font-size: 12px;
+  font-size: 11px;
   color: #cbd5e1;
   text-align: right;
   transition: color 0.15s;
