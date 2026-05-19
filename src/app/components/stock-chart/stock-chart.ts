@@ -5,11 +5,11 @@ import { PolygonService, Bar } from '../../services/polygon';
 
 const CHART_THEME = {
   autoSize: true,
-  layout: { background: { color: '#0f172a' }, textColor: '#94a3b8', fontSize: 12 },
-  grid: { vertLines: { color: '#1e293b' }, horzLines: { color: '#1e293b' } },
+  layout: { background: { color: '#ffffff' }, textColor: '#475569', fontSize: 12 },
+  grid: { vertLines: { color: '#f1f5f9' }, horzLines: { color: '#f1f5f9' } },
   crosshair: { mode: 1 },
-  rightPriceScale: { borderColor: '#334155' },
-  timeScale: { borderColor: '#334155', timeVisible: true, secondsVisible: false },
+  rightPriceScale: { borderColor: '#e2e8f0' },
+  timeScale: { borderColor: '#e2e8f0', timeVisible: true, secondsVisible: false },
   handleScroll: { mouseWheel: true, pressedMouseMove: true },
   handleScale: { mouseWheel: true, pinch: true },
 };
