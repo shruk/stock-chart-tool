@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
 import { FunctionsService } from '../../services/functions.service';
-import { MockDataService } from '../../services/mock-data';
 import { AuthService } from '../../services/auth.service';
 import { SparklineComponent } from '../../components/sparkline/sparkline';
 
@@ -22,7 +21,6 @@ interface StockCard {
   intradayLoading: boolean;
 }
 
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -34,10 +32,8 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private supabaseSvc = inject(SupabaseService);
   private functionsSvc = inject(FunctionsService);
-  private mockDataSvc = inject(MockDataService);
   auth = inject(AuthService);
 
-  testMode = signal(false);
   stocks = signal<StockCard[]>([]);
   loadingSymbols = signal(true);
 
@@ -49,13 +45,6 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {}
-
-  toggleTestMode() {
-    const next = !this.testMode();
-    this.testMode.set(next);
-    if (next) this.loadMockData();
-    else this.loadSymbols();
-  }
 
   private readonly GUEST_SYMBOLS = ['QQQ', 'AAPL', 'MSFT'];
 
@@ -92,7 +81,6 @@ export class DashboardComponent implements OnInit {
               : s
           ));
         });
-        // Mark any that got no quote as done loading
         this.stocks.update(list => list.map(s => s.loading ? { ...s, loading: false } : s));
       },
       error: () => this.stocks.update(list => list.map(s => ({ ...s, loading: false }))),
@@ -117,26 +105,11 @@ export class DashboardComponent implements OnInit {
     this.supabaseSvc.getAnalystData(symbol).then(data => {
       this.stocks.update(list => list.map(s =>
         s.symbol === symbol ? {
-          ...s,
-          analyst: data,
-          analystLoading: false,
+          ...s, analyst: data, analystLoading: false,
           name: data?.profile?.name || s.symbol
         } : s
       ));
     });
-  }
-
-  private loadMockData() {
-    this.stocks.update(list => list.map(s => {
-      const price = 100 + Math.random() * 200;
-      const change = (Math.random() - 0.48) * 5;
-      const mockBars = Array.from({ length: 78 }, (_, i) => price + Math.sin(i / 5) * 3 + (Math.random() - 0.5) * 2);
-      return {
-        ...s, price, change, changePct: (change / price) * 100, loading: false,
-        analyst: this.mockDataSvc.generateAnalyst(price), analystLoading: false,
-        intradayBars: mockBars, intradayLoading: false,
-      };
-    }));
   }
 
   openStock(symbol: string) { this.router.navigate(['/stock', symbol]); }

@@ -44,21 +44,7 @@
     &:hover { border-color: #3b82f6; color: #f1f5f9; }
   }
 
-  .test-mode-btn {
-    background: transparent;
-    border: 1px solid #334155;
-    color: #94a3b8;
-    border-radius: 6px;
-    padding: 6px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
-
-    &:hover { border-color: #f59e0b; color: #f59e0b; }
-    &.active { background: rgba(245,158,11,0.15); border-color: #f59e0b; color: #f59e0b; }
-  }
-
-  .symbol-badge {
+.symbol-badge {
     background: #3b82f6;
     color: white;
     padding: 4px 12px;
@@ -133,15 +119,6 @@
     &:hover { border-color: #64748b; color: #94a3b8; }
     &.on { background: rgba(59,130,246,0.15); border-color: #3b82f6; color: #60a5fa; }
   }
-}
-
-.test-banner {
-  background: #fef3c7;
-  border-bottom: 1px solid #f59e0b;
-  color: #d97706;
-  font-size: 13px;
-  padding: 8px 24px;
-  text-align: center;
 }
 
 .content { padding: 0; }

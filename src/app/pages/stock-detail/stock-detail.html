@@ -6,9 +6,6 @@
       <span class="symbol-badge">{{ symbol() }}</span>
     }
     <div class="header-actions">
-      <button class="test-mode-btn" [class.active]="testMode()" (click)="toggleTestMode()">
-        {{ testMode() ? '&#9632; Exit Test Mode' : '&#9654; Test Mode' }}
-      </button>
       <app-settings-panel />
     </div>
   </header>
@@ -40,10 +37,6 @@
         <button class="toggle" [class.on]="showRSI()"    (click)="showRSI.set(!showRSI())">RSI</button>
         <button class="toggle" [class.on]="showMACD()"   (click)="showMACD.set(!showMACD())">MACD</button>
       </div>
-
-      @if (testMode()) {
-        <div class="test-banner">Test Mode — displaying generated fake data. No API key required.</div>
-      }
 
       <div class="content">
         @if (loading()) {

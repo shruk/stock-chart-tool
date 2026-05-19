@@ -8,7 +8,6 @@ import { QaPanelComponent } from '../../components/qa-panel/qa-panel';
 import { Bar } from '../../services/polygon';
 import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
-import { MockDataService } from '../../services/mock-data';
 import { FunctionsService, SymbolQa, RiskData } from '../../services/functions.service';
 
 @Component({
@@ -22,14 +21,12 @@ export class StockDetailComponent implements OnInit {
   private route        = inject(ActivatedRoute);
   private router       = inject(Router);
   private supabaseSvc  = inject(SupabaseService);
-  private mockDataSvc  = inject(MockDataService);
   private functionsSvc = inject(FunctionsService);
 
   bars = signal<Bar[]>([]);
   symbol = signal('');
   loading = signal(false);
   error = signal('');
-  testMode = signal(false);
 
   analystData    = signal<AnalystData | null>(null);
   analystLoading = signal(false);
@@ -73,10 +70,6 @@ export class StockDetailComponent implements OnInit {
   }
 
   private async loadPrices(sym: string, timeframe: string) {
-    if (this.testMode()) {
-      this.bars.set(this.mockDataSvc.generate(timeframe as any));
-      return;
-    }
     this.loading.set(true);
     this.error.set('');
 
@@ -127,38 +120,14 @@ export class StockDetailComponent implements OnInit {
     });
   }
 
-  toggleTestMode() {
-    const next = !this.testMode();
-    this.testMode.set(next);
-    if (next) {
-      const bars = this.mockDataSvc.generate('3M');
-      this.bars.set(bars);
-      this.analystData.set(this.mockDataSvc.generateAnalyst(bars[bars.length - 1]?.close ?? 150));
-      this.error.set('');
-    } else {
-      this.bars.set([]);
-      this.analystData.set(null);
-      this.riskData.set(null);
-      this.loadPrices(this.symbol(), '3M');
-      this.loadAnalyst(this.symbol());
-    }
-  }
-
   onSearch(params: SearchParams) {
-    const sym = params.symbol;
-    this.symbol.set(sym);
-
-    if (this.testMode()) {
-      const bars = this.mockDataSvc.generate(params.timeframe);
-      this.bars.set(bars);
-      this.analystData.set(this.mockDataSvc.generateAnalyst(bars[bars.length - 1]?.close ?? 150));
-      return;
-    }
-
-    this.loadPrices(sym, params.timeframe);
-    this.loadAnalyst(sym);
-    this.loadQa(sym);
-    this.loadRisk(sym);
+    this.symbol.set(params.symbol);
+    this.bars.set([]);
+    this.error.set('');
+    this.loadPrices(params.symbol, params.timeframe);
+    this.loadAnalyst(params.symbol);
+    this.loadQa(params.symbol);
+    this.loadRisk(params.symbol);
   }
 
   goBack() { this.router.navigate(['/']); }
