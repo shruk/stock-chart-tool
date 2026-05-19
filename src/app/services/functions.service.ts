@@ -63,9 +63,21 @@ export class FunctionsService {
     return this.http.get<Bar[]>(`${this.base}/intraday/${symbol}`);
   }
 
+  getQuotes(symbols: string[]): Observable<QuoteResult[]> {
+    return this.http.get<QuoteResult[]>(`${this.base}/quotes?symbols=${symbols.join(',')}`);
+  }
+
   getLogs(type: LogType, hours = 48): Observable<LogEntry[]> {
     return this.http.get<LogEntry[]>(`${this.base}/logs?type=${type}&hours=${hours}`);
   }
+}
+
+export interface QuoteResult {
+  symbol: string;
+  name: string | null;
+  price: number;
+  change: number;
+  changePct: number;
 }
 
 export type LogType = 'jobs' | 'admin' | 'ui';

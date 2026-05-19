@@ -1,7 +1,6 @@
 import { Component, signal, inject, OnInit, effect } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { Bar } from '../../services/polygon';
 import { AnalystData } from '../../services/finnhub';
 import { SupabaseService } from '../../services/supabase';
 import { FunctionsService } from '../../services/functions.service';
@@ -69,25 +68,31 @@ export class DashboardComponent implements OnInit {
           loading: true, error: '', analyst: null, analystLoading: true,
         })));
         this.loadingSymbols.set(false);
-        symbols.forEach(symbol => this.loadStock(symbol));
+        this.loadQuotes(symbols);
+        symbols.forEach(symbol => this.loadName(symbol));
       },
       error: () => this.loadingSymbols.set(false)
     });
   }
 
-  private loadStock(symbol: string) {
-    this.supabaseSvc.getPriceBars(symbol, this.fromDate(90)).then(bars => {
-      if (bars?.length) {
-        this.stocks.update(list => list.map(s =>
-          s.symbol === symbol ? { ...s, ...this.summarize(bars), loading: false } : s
-        ));
-      } else {
-        this.stocks.update(list => list.map(s =>
-          s.symbol === symbol ? { ...s, loading: false, error: 'No data' } : s
-        ));
-      }
+  private loadQuotes(symbols: string[]) {
+    this.functionsSvc.getQuotes(symbols).subscribe({
+      next: quotes => {
+        quotes.forEach(q => {
+          this.stocks.update(list => list.map(s =>
+            s.symbol === q.symbol
+              ? { ...s, price: q.price, change: q.change, changePct: q.changePct, loading: false }
+              : s
+          ));
+        });
+        // Mark any that got no quote as done loading
+        this.stocks.update(list => list.map(s => s.loading ? { ...s, loading: false } : s));
+      },
+      error: () => this.stocks.update(list => list.map(s => ({ ...s, loading: false }))),
     });
+  }
 
+  private loadName(symbol: string) {
     this.supabaseSvc.getAnalystData(symbol).then(data => {
       this.stocks.update(list => list.map(s =>
         s.symbol === symbol ? {
@@ -102,27 +107,13 @@ export class DashboardComponent implements OnInit {
 
   private loadMockData() {
     this.stocks.update(list => list.map(s => {
-      const bars = this.mockDataSvc.generate('3M');
-      const summary = this.summarize(bars);
+      const price = 100 + Math.random() * 200;
+      const change = (Math.random() - 0.48) * 5;
       return {
-        ...s, ...summary, loading: false,
-        analyst: this.mockDataSvc.generateAnalyst(summary.price ?? 150), analystLoading: false,
+        ...s, price, change, changePct: (change / price) * 100, loading: false,
+        analyst: this.mockDataSvc.generateAnalyst(price), analystLoading: false,
       };
     }));
-  }
-
-  private fromDate(days: number): string {
-    const d = new Date();
-    d.setDate(d.getDate() - days);
-    return d.toISOString().split('T')[0];
-  }
-
-  private summarize(bars: Bar[]): Pick<StockCard, 'price' | 'change' | 'changePct'> {
-    if (bars.length < 2) return { price: null, change: null, changePct: null };
-    const last = bars[bars.length - 1];
-    const prev = bars[bars.length - 2];
-    const change = last.close - prev.close;
-    return { price: last.close, change, changePct: (change / prev.close) * 100 };
   }
 
   openStock(symbol: string) { this.router.navigate(['/stock', symbol]); }
