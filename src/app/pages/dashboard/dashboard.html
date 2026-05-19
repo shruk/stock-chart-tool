@@ -61,7 +61,14 @@
           }
         </div>
 
-@if (auth.isMember()) {
+        <!-- Intraday sparkline -->
+        @if (stock.intradayLoading) {
+          <div class="spark-skeleton"></div>
+        } @else if (stock.intradayBars.length > 0) {
+          <app-sparkline [data]="stock.intradayBars" />
+        }
+
+        @if (auth.isMember()) {
           <div class="drill-hint">View full chart &#8594;</div>
         } @else {
           <div class="drill-hint guest">Sign in to view full chart &#8594;</div>

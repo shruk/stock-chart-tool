@@ -6,6 +6,7 @@ import { SupabaseService } from '../../services/supabase';
 import { FunctionsService } from '../../services/functions.service';
 import { MockDataService } from '../../services/mock-data';
 import { AuthService } from '../../services/auth.service';
+import { SparklineComponent } from '../../components/sparkline/sparkline';
 
 interface StockCard {
   symbol: string;
@@ -17,13 +18,15 @@ interface StockCard {
   error: string;
   analyst: AnalystData | null;
   analystLoading: boolean;
+  intradayBars: number[];
+  intradayLoading: boolean;
 }
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, SparklineComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -66,10 +69,14 @@ export class DashboardComponent implements OnInit {
           symbol, name: symbol,
           price: null, change: null, changePct: null,
           loading: true, error: '', analyst: null, analystLoading: true,
+          intradayBars: [], intradayLoading: true,
         })));
         this.loadingSymbols.set(false);
         this.loadQuotes(symbols);
-        symbols.forEach(symbol => this.loadName(symbol));
+        symbols.forEach(symbol => {
+          this.loadName(symbol);
+          this.loadIntraday(symbol);
+        });
       },
       error: () => this.loadingSymbols.set(false)
     });
@@ -92,6 +99,20 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  private loadIntraday(symbol: string) {
+    this.functionsSvc.getIntradayBars(symbol).subscribe({
+      next: bars => {
+        const closes = bars.map(b => b.close);
+        this.stocks.update(list => list.map(s =>
+          s.symbol === symbol ? { ...s, intradayBars: closes, intradayLoading: false } : s
+        ));
+      },
+      error: () => this.stocks.update(list => list.map(s =>
+        s.symbol === symbol ? { ...s, intradayLoading: false } : s
+      )),
+    });
+  }
+
   private loadName(symbol: string) {
     this.supabaseSvc.getAnalystData(symbol).then(data => {
       this.stocks.update(list => list.map(s =>
@@ -109,9 +130,11 @@ export class DashboardComponent implements OnInit {
     this.stocks.update(list => list.map(s => {
       const price = 100 + Math.random() * 200;
       const change = (Math.random() - 0.48) * 5;
+      const mockBars = Array.from({ length: 78 }, (_, i) => price + Math.sin(i / 5) * 3 + (Math.random() - 0.5) * 2);
       return {
         ...s, price, change, changePct: (change / price) * 100, loading: false,
         analyst: this.mockDataSvc.generateAnalyst(price), analystLoading: false,
+        intradayBars: mockBars, intradayLoading: false,
       };
     }));
   }
