@@ -6,28 +6,23 @@
   gap: 12px;
   flex-wrap: wrap;
   padding: 12px 24px;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .input {
-  background: #0f172a;
-  border: 1px solid #334155;
-  color: #e2e8f0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 14px;
   outline: none;
 
-  &:focus {
-    border-color: #3b82f6;
-  }
+  &:focus { border-color: #3b82f6; }
 }
 
-
-.symbol-input {
-  width: 140px;
-}
+.symbol-input { width: 140px; }
 
 .timeframe-group {
   display: flex;
@@ -36,18 +31,15 @@
 
 .btn-tf {
   background: transparent;
-  border: 1px solid #334155;
-  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
   border-radius: 6px;
   padding: 8px 12px;
   cursor: pointer;
   font-size: 13px;
   transition: all 0.15s;
 
-  &:hover {
-    border-color: #3b82f6;
-    color: #e2e8f0;
-  }
+  &:hover { border-color: #94a3b8; color: #1e293b; }
 
   &.active {
     background: #3b82f6;
@@ -60,4 +52,3 @@
   font-size: 12px;
   color: #f59e0b;
 }
-
