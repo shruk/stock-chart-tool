@@ -39,7 +39,23 @@
         <!-- Top: symbol / name / price -->
         <div class="card-top">
           <div class="card-top-left">
-            <div class="symbol">{{ stock.symbol }}</div>
+            <div class="symbol-row">
+              <div class="symbol">{{ stock.symbol }}</div>
+              @if (stock.analyst?.recommendation) {
+                @let r = stock.analyst!.recommendation!;
+                @let total = r.strongBuy + r.buy + r.hold + r.sell + r.strongSell;
+                @let bullish = total > 0 ? (r.strongBuy + r.buy) / total * 100 : 0;
+                @let bearish = total > 0 ? (r.strongSell + r.sell) / total * 100 : 0;
+                <span class="rating-badge"
+                  [class.rb-strong-buy]="bullish >= 60"
+                  [class.rb-buy]="bullish >= 40 && bullish < 60"
+                  [class.rb-sell]="bearish >= 40 && bearish < 60"
+                  [class.rb-strong-sell]="bearish >= 60"
+                  [class.rb-hold]="bullish < 40 && bearish < 40">
+                  {{ bullish >= 60 ? 'Strong Buy' : bullish >= 40 ? 'Buy' : bearish >= 60 ? 'Strong Sell' : bearish >= 40 ? 'Sell' : 'Hold' }}
+                </span>
+              }
+            </div>
             <div class="name">{{ stock.name }}</div>
           </div>
           @if (stock.loading) {
@@ -62,11 +78,6 @@
           <app-sparkline [data]="stock.intradayBars" />
         }
 
-        @if (auth.isMember()) {
-          <div class="drill-hint">View full chart &#8594;</div>
-        } @else {
-          <div class="drill-hint guest">Sign in to view full chart &#8594;</div>
-        }
       </div>
     }
   </div>

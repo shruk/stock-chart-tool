@@ -458,17 +458,30 @@ app-sparkline {
   .down { color: #dc2626; }
 }
 
-/* ── Drill hint ────────────────────────────────── */
-.drill-hint {
-  font-size: 11px;
-  color: #cbd5e1;
-  text-align: right;
-  transition: color 0.15s;
+.card.clickable { cursor: pointer; }
+
+/* ── Analyst rating badge ──────────────────────── */
+.symbol-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.card.clickable { cursor: pointer; }
-.card.clickable:hover .drill-hint { color: #3b82f6; }
-.drill-hint.guest { color: #e2e8f0; font-style: italic; }
+.rating-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+
+  &.rb-strong-buy  { background: #dcfce7; color: #15803d; }
+  &.rb-buy         { background: #d1fae5; color: #16a34a; }
+  &.rb-hold        { background: #fef9c3; color: #a16207; }
+  &.rb-sell        { background: #fee2e2; color: #dc2626; }
+  &.rb-strong-sell { background: #fecaca; color: #b91c1c; }
+}
 
 /* ── Animations ────────────────────────────────── */
 @keyframes shimmer { to { left: 140%; } }
