@@ -1,7 +1,7 @@
 .app {
   min-height: 100vh;
-  background: #0f172a;
-  color: #f1f5f9;
+  background: #f8fafc;
+  color: #1e293b;
   display: flex;
   flex-direction: column;
 }
@@ -11,8 +11,8 @@
   align-items: center;
   gap: 12px;
   padding: 16px 24px;
-  background: #0f172a;
-  border-bottom: 1px solid #1e293b;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
   z-index: 10;
 
@@ -20,7 +20,7 @@
     margin: 0;
     font-size: 20px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: #0f172a;
   }
 
   .header-actions {
@@ -32,8 +32,8 @@
 
   .back-btn {
     background: transparent;
-    border: 1px solid #334155;
-    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
     border-radius: 6px;
     padding: 6px 14px;
     font-size: 13px;
@@ -41,10 +41,10 @@
     transition: all 0.15s;
     white-space: nowrap;
 
-    &:hover { border-color: #3b82f6; color: #f1f5f9; }
+    &:hover { border-color: #3b82f6; color: #3b82f6; }
   }
 
-.symbol-badge {
+  .symbol-badge {
     background: #3b82f6;
     color: white;
     padding: 4px 12px;
@@ -71,14 +71,14 @@
   top: 0;
   max-height: 100vh;
   overflow-y: auto;
-  background: #0f172a;
-  border-right: 1px solid #1e293b;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
 
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0f172a;
+  scrollbar-color: #cbd5e1 #f8fafc;
   &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: #0f172a; }
-  &::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+  &::-webkit-scrollbar-track { background: #f8fafc; }
+  &::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
 }
 
 /* Right: chart + Q&A — scrolls with the page */
@@ -96,19 +96,19 @@
   align-items: center;
   gap: 8px;
   padding: 10px 24px;
-  background: #0f172a;
-  border-bottom: 1px solid #1e293b;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   flex-wrap: wrap;
 
   .label {
     font-size: 13px;
-    color: #64748b;
+    color: #94a3b8;
     margin-right: 4px;
   }
 
   .toggle {
     background: transparent;
-    border: 1px solid #334155;
+    border: 1px solid #e2e8f0;
     color: #64748b;
     padding: 5px 12px;
     border-radius: 6px;
@@ -116,8 +116,8 @@
     cursor: pointer;
     transition: all 0.15s;
 
-    &:hover { border-color: #64748b; color: #94a3b8; }
-    &.on { background: rgba(59,130,246,0.15); border-color: #3b82f6; color: #60a5fa; }
+    &:hover { border-color: #94a3b8; color: #1e293b; }
+    &.on { background: #eff6ff; border-color: #3b82f6; color: #3b82f6; }
   }
 }
 
@@ -128,12 +128,12 @@
   padding: 60px 40px;
 
   p { margin: 8px 0; font-size: 15px; color: #64748b; }
-  .hint { font-size: 13px; color: #475569; }
+  .hint { font-size: 13px; color: #94a3b8; }
   &.loading { color: #64748b; font-size: 16px; }
   &.error {
-    color: #f87171;
-    background: rgba(220,38,38,0.1);
-    border: 1px solid rgba(220,38,38,0.3);
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
     border-radius: 8px;
     margin: 24px;
   }
