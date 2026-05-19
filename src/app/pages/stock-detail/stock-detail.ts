@@ -57,6 +57,11 @@ export class StockDetailComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const sym = (params.get('symbol') ?? '').toUpperCase();
       this.symbol.set(sym);
+      this.bars.set([]);
+      this.error.set('');
+      this.analystData.set(null);
+      this.qaData.set(null);
+      this.riskData.set(null);
       if (sym) {
         this.loadPrices(sym, '3M');
         this.loadAnalyst(sym);
