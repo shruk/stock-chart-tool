@@ -27,28 +27,36 @@ import { Component, input, computed } from '@angular/core';
   styles: [':host { display: block; }']
 })
 export class SparklineComponent {
-  readonly data = input<number[]>([]);
-
-  readonly color = computed(() => {
-    const d = this.data();
-    if (d.length < 2) return '#94a3b8';
-    return d[d.length - 1] >= d[0] ? '#22c55e' : '#ef4444';
-  });
+  readonly data        = input<number[]>([]);
+  readonly prevClose   = input<number | null>(null);
 
   private readonly scale = computed(() => {
     const d = this.data();
     if (d.length < 2) return null;
-    const min = Math.min(...d);
-    const max = Math.max(...d);
+    const ref = this.prevClose();
+    const vals = ref != null ? [...d, ref] : d;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
     const range = max - min || 1;
-    return { min, range };
+    return { min, max, range };
   });
 
+  // Use prevClose as the reference for color so it matches the displayed change%
+  readonly color = computed(() => {
+    const d = this.data();
+    if (d.length < 2) return '#94a3b8';
+    const ref = this.prevClose() ?? d[0];
+    return d[d.length - 1] >= ref ? '#22c55e' : '#ef4444';
+  });
+
+  // Dotted baseline at prevClose (or first bar if not provided)
   readonly baselineY = computed(() => {
     const s = this.scale();
     const d = this.data();
     if (!s || d.length < 2) return 38;
-    return +(38 - ((d[0] - s.min) / s.range) * 34).toFixed(1);
+    const ref = this.prevClose() ?? d[0];
+    const clamped = Math.max(s.min, Math.min(s.max, ref));
+    return +(38 - ((clamped - s.min) / s.range) * 34).toFixed(1);
   });
 
   readonly points = computed(() => {

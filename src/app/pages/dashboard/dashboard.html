@@ -75,7 +75,7 @@
         @if (stock.intradayLoading) {
           <div class="spark-skeleton"></div>
         } @else if (stock.intradayBars.length > 0) {
-          <app-sparkline [data]="stock.intradayBars" />
+          <app-sparkline [data]="stock.intradayBars" [prevClose]="stock.previousClose" />
         }
 
       </div>

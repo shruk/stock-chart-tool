@@ -13,6 +13,7 @@ interface StockCard {
   price: number | null;
   change: number | null;
   changePct: number | null;
+  previousClose: number | null;
   loading: boolean;
   error: string;
   analyst: AnalystData | null;
@@ -56,7 +57,7 @@ export class DashboardComponent implements OnInit {
         const symbols = this.auth.isMember() ? all : all.filter(s => this.GUEST_SYMBOLS.includes(s));
         this.stocks.set(symbols.map(symbol => ({
           symbol, name: symbol,
-          price: null, change: null, changePct: null,
+          price: null, change: null, changePct: null, previousClose: null,
           loading: true, error: '', analyst: null, analystLoading: true,
           intradayBars: [], intradayLoading: true,
         })));
@@ -77,7 +78,7 @@ export class DashboardComponent implements OnInit {
         quotes.forEach(q => {
           this.stocks.update(list => list.map(s =>
             s.symbol === q.symbol
-              ? { ...s, price: q.price, change: q.change, changePct: q.changePct, loading: false }
+              ? { ...s, price: q.price, change: q.change, changePct: q.changePct, previousClose: q.price - q.change, loading: false }
               : s
           ));
         });
