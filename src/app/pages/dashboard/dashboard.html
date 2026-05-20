@@ -34,7 +34,7 @@
   }
   <div class="grid">
     @for (stock of stocks(); track stock.symbol) {
-      <div class="card" [class.clickable]="auth.isMember()" (click)="auth.isMember() && openStock(stock.symbol)">
+      <div class="card" [class.clickable]="auth.isMember()" (click)="auth.isMember() && openStock(stock)">
 
         <!-- Top: symbol / name / price -->
         <div class="card-top">

@@ -112,7 +112,9 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  openStock(symbol: string) { this.router.navigate(['/stock', symbol]); }
+  openStock(stock: StockCard) {
+    this.router.navigate(['/stock', stock.symbol], { state: { analystData: stock.analyst } });
+  }
   openAdmin() { this.router.navigate(['/admin']); }
   openJobs()  { this.router.navigate(['/jobs']); }
   openDocs()  { this.router.navigate(['/docs']); }

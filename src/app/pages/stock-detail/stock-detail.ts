@@ -28,7 +28,9 @@ export class StockDetailComponent implements OnInit {
   loading = signal(false);
   error = signal('');
 
-  analystData    = signal<AnalystData | null>(null);
+  analystData    = signal<AnalystData | null>(
+    (this.router.getCurrentNavigation()?.extras?.state?.['analystData'] as AnalystData) ?? null
+  );
   analystLoading = signal(false);
 
   qaData    = signal<SymbolQa | null>(null);
@@ -53,16 +55,17 @@ export class StockDetailComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const sym = (params.get('symbol') ?? '').toUpperCase();
+      const hasPreloaded = !!this.analystData();
       this.symbol.set(sym);
       this.bars.set([]);
       this.error.set('');
-      this.analystData.set(null);
+      if (!hasPreloaded) this.analystData.set(null);
       this.qaData.set(null);
       this.riskData.set(null);
       if (sym) {
         const tf = (localStorage.getItem('preferred_timeframe') ?? '3M') as any;
         this.loadPrices(sym, tf);
-        this.loadAnalyst(sym);
+        if (!hasPreloaded) this.loadAnalyst(sym);
         this.loadQa(sym);
         this.loadRisk(sym);
       }
